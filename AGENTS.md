@@ -28,8 +28,8 @@
 
 ## 文档与事实边界
 - 根目录 `AGENTS.md` 是唯一工程入口；`.agents/` 仅维护当前工程事实，不创建空专题。
-- `.product/` 存放产品事实与功能包；当前不存在，本轮仅做工程初始化，不创建产品规范。
-- 后续产品类任务先按用户提供的产品上下文骨架建立 `.product/README.md`、`start-prompt.md` 和 `phase-1/`；PRD 待用户提供。
+- `.product/` 存放产品事实与功能包；入口见 [.product/README.md](.product/README.md)，产品任务遵循其中的启动提示词。
+- 产品上下文骨架已建立，当前处于 README 需求清洗与澄清阶段，尚无定稿或已批准 PRD。
 - 产品需求与反馈先落盘，再进入 Loop；PRD 必须由用户明确批准，Agent 才能记录批准状态、日期及确认人。
 - 产品功能包包含同前缀、同 PRD 版本的 `prd`、`schedule-quote`、`delivery-status`、`traceability` 四份 Markdown 文件；未知字段留空待填。
 - 代码、配置、测试及 CI 说明当前实现事实；已批准产品文档说明目标，发生冲突时分别记录并报告差异。
