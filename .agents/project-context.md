@@ -1,44 +1,61 @@
 # 当前工程上下文
 
-核对日期：2026-10-02。本文记录工程事实，不定义产品需求或技术选型。
+核对日期：2026-10-02。当前实现不等于产品批准；产品入口见 [.product/README.md](../.product/README.md)。
 
-## 证据与当前状态
+## 技术栈与状态
 
-- 初始化前目录仅有 `README.md`（UTF-8），包含桌面翻译与单词学习的初步设想。
-- 无源码、依赖清单、锁文件、构建配置、测试、CI、部署配置或其他既有文档。
-- `git rev-parse --show-toplevel` 返回 `not a git repository`；当前目录尚未初始化 Git。
-- 技术栈、模块边界、API、数据模型和运行架构均未建立，不推断编程语言、框架或包管理器。
-- 安装、开发、测试、lint、构建与部署命令均未定义，统一见根目录 `AGENTS.md`。
-- 初始化前没有 Agent 文档，因此没有需要删除的重复、冲突或过期 Agent 文档。
+- Electron 44.5.1 + 原生 HTML/CSS/JavaScript；开发使用 Node.js 24+。
+- Windows PowerShell 5.1（STA）调用 UI Automation / Windows Forms 完成取词。
+- 产品目标 Windows 10 及以上；本轮构建 Windows x64，未覆盖全部系统与架构实机。
+- 当前已有 Git。初始化时不存在 Git 的记录仅是历史状态。
+- 真实命令来自 package.json 与锁文件，统一见根目录 AGENTS.md；PowerShell 可使用 npm.cmd。
 
 ## 当前目录
 
 ```text
-Eng_Learning/
-├── README.md                    # 原始产品设想，保留原文
-├── AGENTS.md                    # 唯一工程入口、命令和全局规则
-├── .agents/
-│   └── project-context.md       # 当前工程事实与缺口
-└── .product/                    # 产品入口与澄清记录，详见其 README
+src/
+  main.cjs                 生命周期、IPC、全局快捷键、任务协调
+  preload.cjs              最小化 renderer API
+  config.cjs               .env 加载、校验与无密钥的公开配置
+  translation/             输入校验、兼容 Chat Completions 客户端
+  learning/                学习 JSON 存储、按日复习、词库解析
+  windows/                 PowerShell 取词与进程包装
+  renderer/                翻译、学习记录、词库、设置四个视图
+scripts/                   启动、语法检查、打包、Electron 冒烟检查
+test/                      核心业务与 HTTP 协议测试
+.product/                  原始证据、澄清与暂定范围
 ```
 
-工程初始化时未创建 `.product/`；用户随后明确启动 README 需求清洗，现已建立产品骨架。当前产品阶段与材料导航以 [.product/README.md](../.product/README.md) 为准，不在工程文档中复制详细需求。
+## 运行配置与服务
 
-## 已发现的缺口与待决事项
+- `.env.example` 提供非敏感默认配置。开发读取根目录 .env，打包应用读取 exe 同级 .env。
+- 优先级：模板 < 本地 .env < 进程同名环境变量。数字和布尔配置严格校验。
+- 用户明确选择自建/中转 OpenAI 兼容服务，地址、模型与密钥由用户稍后本地填写；不创建 OpenAI 账号密钥或切换服务。
+- 主进程请求 `AI_BASE_URL + /chat/completions`，传入 model、stream:false 和 system/user messages，读取 choices[0].message.content。不自动追加 /v1。
+- 不自动重定向；HTTP 失败、超时、取消、空响应、无效 JSON 和截断响应均显式失败。
+- renderer 仅显示纯文本，无 Node/网络权限；启用上下文隔离、sandbox、CSP 和 IPC 来源校验。
+- .env 不纳入 Git/构建包，打包输出只复制空密钥模板，密钥不通过 IPC 暴露。
 
-| 项目 | 当前事实及影响 | 后续处理 |
-| --- | --- | --- |
-| 产品基线 | README 是设想，没有正式 PRD、批准记录或可追踪验收标准 | 产品类任务先整理需求，待用户批准 |
-| 技术选型 | 未指定目标操作系统、应用框架或运行时，无法确定实现与命令 | 在范围明确后完成选型，再建立实际配置 |
-| 版本管理 | 无 Git 仓库，当前无法提供 Git diff 或提交记录 | 后续工程搭建时建立版本管理 |
-| 工程验证 | 无源码、测试、lint、构建和 CI，无法运行应用验证 | 随工程搭建定义配置与检查，再同步命令表 |
-| 数据与外部服务 | 无存储、接口、服务接入或环境配置 | 实际引入后记录工程事实并维护 `.env.example` |
+## 取词与持久化
 
-当前没有可审计的业务代码，不能认定存在具体代码层面的技术债；上述事项是工程尚未建立带来的缺口。
+- 默认 Ctrl+Alt+E，来自 .env；冲突显式提示，配置重载注册失败时保留旧快捷键。
+- 先取 UI Automation 选区，无可用选区再 Ctrl+C，检测剪贴板序列号，不能把旧剪贴板当作选区。
+- 复制前快照剪贴板；只有剪贴板未再被其他程序修改时才恢复，恢复失败提示。
+- 取词受应用权限、自定义控件、保护内容、剪贴板格式和系统策略影响；所有可复制应用兼容性仍需验收。
+- 成功翻译且写盘成功才计数；失败/取消不计数，不允许并发翻译。
+- learning.json 默认在 Electron userData，DATA_DIRECTORY 可指定绝对目录；写临时文件再重命名，失败不改内存，损坏数据不覆盖。
+- 英文大小写归一、词形不合并；本机日历日去重，复习状态按词/日期保存、可撤销。
+- 每词保存最新译文、累计次数及出现日期；历史日期也显示最新译文，不保存逐次译文。
+- 词库支持 UTF-8 TXT 单词行和 JSON 字符串数组；英文大小写去重，同名库拒绝，无效项整份拒绝。
+- 中文输入单独记条目，不自动将译文中的英文候选加入词库或计数。
 
-## 维护要求与下一步
+## 验证、限制与后续维护
 
-- 当前正在按用户提供的《PRD清洗提示词》清洗 README；下一步继续需求澄清，确认后产出待批准功能包，不直接进入功能开发。
-- 产品文件中记录目标与批准状态；本目录只记录已存在的工程实现，不复制详细产品需求。
-- 引入源码、配置、测试或 CI 后立即核对根入口中的命令，依据实际内容新增必要专题，不预建空架构、API 或数据库文档。
-- 本轮验证范围为文件盘点、README UTF-8 读取、Git 状态探测、文档内容及链接核对；无可执行的工程测试或构建命令。
+- npm test 覆盖输入、持久化、复习、词库、损坏/写盘失败、配置/密钥隔离、真实本地 HTTP 协议及错误处理。
+- lint 仅检查 JavaScript 语法和源码行数；smoke 检查隐藏 Electron 窗口的 IPC、导航、拒绝输入、隔离与截图，使用 artifacts 隔离数据。
+- build 生成未签名 Windows x64 便携目录；无 CI、安装器或自动部署。
+- 真实中转服务未配置，不能宣称端到端翻译通过。全局跨应用取词需实机验收。
+- 中文整句目前仅按标点/换行限制，不能可靠区分无标点句子；最终边界仍需澄清。
+- 日终自动提醒尚未实现，只能主动打开当天列表，不将原需求标记为已完成。
+- 文档随配置与代码同步更新，产品目标和批准状态仍只在 .product/ 中维护。
+- 参考：[Chat Completions](https://developers.openai.com/api/reference/resources/chat)、[globalShortcut](https://www.electronjs.org/docs/latest/api/global-shortcut/)、[Electron security](https://www.electronjs.org/docs/latest/tutorial/security)。

@@ -1,0 +1,21 @@
+{
+  "name": "wordbridge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal Windows translation and vocabulary notebook",
+  "main": "src/main.cjs",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "postinstall": "node node_modules/electron/install.js",
+    "dev": "node scripts/launch.cjs",
+    "test": "node --test test/*.test.cjs",
+    "lint": "node scripts/check.cjs",
+    "build": "node scripts/package.cjs",
+    "smoke": "node scripts/launch.cjs --smoke-test",
+    "smoke:packaged": "node scripts/launch.cjs --smoke-test --packaged"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "electron": "44.5.1"
+  }
+}

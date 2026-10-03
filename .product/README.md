@@ -1,10 +1,11 @@
 # 产品上下文
 
 - 产品定位（原始意向，未定稿）：桌面端中英单词翻译与学习工具。
-- 当前阶段：需求清洗 / 第 2 轮已答复，第 3 轮输入与取词边界待答复；尚未进入 PRD 撰写，未批准。
+- 当前阶段：用户明确要求先开始开发，首版实现中；需求澄清尚未完成，PRD 未定稿、未批准。
 - 原始资料：[README.md](../README.md)。已确认个人自用、Windows 10 及以上、双向翻译、选中后快捷键触发；应用范围为可复制文字的应用，具体取词操作及中英文输入边界继续澄清。
 - 产品任务入口：[start-prompt.md](start-prompt.md)。
 - 澄清、证据与决策：[phase-1/clarification-log.md](phase-1/clarification-log.md)。
+- 后续开发授权、服务选择及待确认行为：[phase-1/development-scope.md](phase-1/development-scope.md)。
 - `phase-1/` 当前仅收集需求，目录名不代表客户已批准分期。
 - 四份同前缀配套文件待排雷完成、用户确认进入撰写后产出；功能包名与 PRD 版本届时确定。
 - PRD 批准仅以用户明确确认后写入对应 `delivery-status.md` 的记录生效；当前没有批准记录。

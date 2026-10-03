@@ -3,3 +3,54 @@
 可以支持导入词库（如四级或者六级或者雅思或者托福）查询的时候显示是什么类型的词（来源于哪个词库，一个词可能来源于多个词库）
 
 同时有学习功能，每天结束的时候显示当天的学习单词的内容,可以进行复习，复习过的单词就可以点击学习
+
+---
+
+# 拾词 · WordBridge 开发首版
+
+Windows 桌面划词翻译与学习应用。上方保留原始需求；当前是用户授权的开发首版，不代表 PRD 已批准。
+
+## 运行与配置
+
+开发需要 Node.js 24+、Windows PowerShell。安装会下载 Electron 运行时。
+
+```powershell
+npm.cmd ci
+npm.cmd run dev
+```
+
+首次开发启动自动从 `.env.example` 创建 `.env`。在本机填写 `AI_BASE_URL`、`AI_MODEL`、`AI_API_KEY`，保存后在“翻译设置”点击“重新加载配置”。不要发送或提交密钥。
+
+地址填服务 API 前缀（通常包含 `/v1`），不含 `/chat/completions`。模型名由你的中转服务提供。服务不要求鉴权时可明确设置 `AI_REQUIRE_KEY=false`。未配置时翻译明确报错，不生成假结果。
+
+## 使用
+
+- 保持应用运行，在其他应用选中文字，按默认 `Ctrl+Alt+E` 取词翻译；也可在主窗口输入。
+- 快捷键占用时修改 .env 的 `TRANSLATE_SHORTCUT`，然后重新加载。关闭窗口即退出并释放快捷键。
+- 成功翻译后记录次数和当天单词；复习页可查看释义、标记已复习及撤销。
+- 词库支持 UTF-8 TXT（每行一个英文单词）或 JSON 数组，如 `["apple","book"]`。同一词可归属多个词库；不内置考试词库。
+- 提示词在设置页保存，下次请求生效。密钥只在本地 .env 管理，不在界面显示。
+- 学习记录保存位置显示在设置页；可通过 .env 的 `DATA_DIRECTORY` 指定绝对目录，需重启生效。
+
+## 验证与打包
+
+```powershell
+npm.cmd test
+npm.cmd run lint
+npm.cmd run smoke
+npm.cmd run build
+```
+
+lint 检查 JS 语法和行数；smoke 使用隐藏窗口与隔离数据，输出 `artifacts/desktop-smoke.png`。检查不使用真实 AI 服务。
+
+构建产物为 `dist/WordBridge-win32-x64/WordBridge.exe`，需要保留整个目录。包内不含开发机密钥，exe 同级 .env 从空密钥模板生成。当前未签名、无安装器、未发布。
+
+## 当前限制
+
+- 真实服务待本地配置后联调，不能保证所有中转服务兼容。
+- 取词先尝试选区读取，再复制并恢复剪贴板；权限差异、自定义控件和保护内容可能导致失败，所有应用兼容性尚未验证。
+- 英文暂限单词；中文词语/短语支持，整句仅靠标点和换行初步限制，无法精确区分无标点句子。最终规则待确认。
+- 当前按本机日期记录、主动打开复习列表；自动日终展示/提醒尚未实现。
+- 先提供 Windows x64 包；其他架构和不同系统版本需后续验证。暂定规则见 [开发范围](.product/phase-1/development-scope.md)。
+
+工程入口：[AGENTS.md](AGENTS.md)。产品入口：[.product/README.md](.product/README.md)。
