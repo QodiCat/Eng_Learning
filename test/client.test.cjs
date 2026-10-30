@@ -25,7 +25,7 @@ test('compatible service receives the exact model, prompt and user input through
 
 test('configuration errors prevent sending any request', async () => {
   let called = false;
-  await assert.rejects(translate(input, 'prompt', { ...config, apiKey: '' }, { fetchImpl: () => { called = true; } }), /AI_API_KEY/);
+  await assert.rejects(translate(input, 'prompt', { ...config, apiKey: '' }, { fetchImpl: () => { called = true; } }), /翻译设置.*API 密钥/);
   assert.equal(called, false);
 });
 

@@ -12,6 +12,8 @@ contextBridge.exposeInMainWorld('wordbridge', {
   resetPrompt: () => invoke('prompt:reset'),
   review: (key, day, reviewed) => invoke('review', key, day, reviewed),
   reload: () => invoke('config:reload'),
+  saveConfig: input => invoke('config:save', input),
+  saveShortcut: value => invoke('shortcut:save', value),
   importLibrary: name => invoke('library:import', name),
   onEvent: listener => {
     const handler = (_event, event) => listener(event);

@@ -93,3 +93,61 @@ test('local config overrides defaults, environment overrides local, secrets are 
   assert.throws(() => readConfig(directory, { AI_TIMEOUT_MS: 'garbage' }));
   assert.throws(() => readConfig(directory, { ALLOW_CHINESE_SENTENCES: 'maybe' }));
 });
+
+const { saveServiceConfig } = require('../src/config-save.cjs');
+test('service settings persist, retain or clear secrets and preserve advanced config', t => {
+  const directory = temporary(t);
+  fs.writeFileSync(path.join(directory, '.env'), 'AI_TIMEOUT_MS=4500\n');
+  const input = { baseUrl: 'https://provider.example/v1', model: 'test-model', apiKey: 'secret#with=value', requireKey: true, clearKey: false };
+  const saved = saveServiceConfig(directory, input, {});
+  assert.equal(saved.apiKey, input.apiKey);
+  assert.equal(readConfig(directory, {}).apiKey, input.apiKey);
+  assert.equal(saved.timeoutMs, 4500);
+  assert.equal(JSON.stringify(publicConfig(saved)).includes(input.apiKey), false);
+  saveServiceConfig(directory, { ...input, apiKey: '', model: 'new-model' }, {});
+  assert.equal(readConfig(directory, {}).apiKey, input.apiKey);
+  const before = fs.readFileSync(saved.file, 'utf8');
+  assert.throws(() => saveServiceConfig(directory, { ...input, baseUrl: 'invalid' }, {}));
+  assert.throws(() => saveServiceConfig(directory, { ...input, model: 'bad\nAI_API_KEY=x' }, {}));
+  assert.throws(() => saveServiceConfig(directory, input, { AI_MODEL: 'override' }), /环境变量/);
+  assert.equal(fs.readFileSync(saved.file, 'utf8'), before);
+  saveServiceConfig(directory, { ...input, apiKey: '', clearKey: true, requireKey: false }, {});
+  assert.equal(readConfig(directory, {}).apiKey, '');
+});
+test('failed service config write surfaces an error without replacing the original file', t => {
+  const directory = temporary(t);
+  const file = path.join(directory, '.env');
+  fs.writeFileSync(file, 'AI_MODEL=original\n');
+  fs.mkdirSync(`${file}.${process.pid}.tmp`);
+  assert.throws(() => saveServiceConfig(directory, { baseUrl: 'https://provider.example/v1', model: 'new', apiKey: 'key', requireKey: true, clearKey: false }, {}));
+  assert.equal(readConfig(directory, {}).model, 'original');
+});
+
+const { saveShortcutConfig } = require('../src/config-save.cjs');
+test('shortcut persistence preserves service settings and rolls back registration on failure', t => {
+  const directory = temporary(t);
+  const file = path.join(directory, '.env');
+  fs.writeFileSync(file, 'TRANSLATE_SHORTCUT=Ctrl+Alt+E\nAI_API_KEY=retained-secret\n');
+  const registered = new Set(['Ctrl+Alt+E']);
+  const shortcuts = {
+    isRegistered: value => registered.has(value),
+    register: value => { if (value === 'occupied') return false; if (value === 'invalid') throw new Error('invalid'); registered.add(value); return true; },
+    unregister: value => registered.delete(value),
+  };
+  for (const value of ['', null, 'invalid', 'occupied', 'Ctrl+Alt+E\nX=x']) {
+    assert.throws(() => saveShortcutConfig(directory, value, shortcuts, () => {}, 'Ctrl+Alt+E', {}));
+    assert.equal(readConfig(directory, {}).shortcut, 'Ctrl+Alt+E');
+    assert.deepEqual([...registered], ['Ctrl+Alt+E']);
+  }
+  assert.throws(() => saveShortcutConfig(directory, 'Ctrl+Alt+F8', shortcuts, () => {}, 'Ctrl+Alt+E', { TRANSLATE_SHORTCUT: 'override' }), /环境变量/);
+  fs.mkdirSync(`${file}.${process.pid}.tmp`);
+  assert.throws(() => saveShortcutConfig(directory, 'Ctrl+Alt+F8', shortcuts, () => {}, 'Ctrl+Alt+E', {}), /保存失败/);
+  assert.deepEqual([...registered], ['Ctrl+Alt+E']);
+  fs.rmdirSync(`${file}.${process.pid}.tmp`);
+  saveShortcutConfig(directory, 'Ctrl+Alt+F8', shortcuts, () => {}, 'Ctrl+Alt+E', {});
+  assert.equal(readConfig(directory, {}).shortcut, 'Ctrl+Alt+F8');
+  assert.equal(readConfig(directory, {}).apiKey, 'retained-secret');
+  assert.deepEqual([...registered], ['Ctrl+Alt+F8']);
+  saveShortcutConfig(directory, 'Ctrl+Alt+F8', shortcuts, () => {}, 'Ctrl+Alt+F8', {});
+  assert.deepEqual([...registered], ['Ctrl+Alt+F8']);
+});

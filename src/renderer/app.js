@@ -81,6 +81,12 @@ function update(next) {
   $('config-issue').textContent = state.config.issue;
   $('query').maxLength = state.config.maxInputLength;
   $('env-path').textContent = state.config.file;
+  if (!$('shortcut-form').dataset.dirty) $('shortcut-input').value = state.config.shortcut.replace('CommandOrControl', 'Ctrl');
+  if (!$('service-form').dataset.dirty) {
+    $('service-url').value = state.config.baseUrl;
+    $('service-model').value = state.config.model;
+    $('service-require-key').checked = state.config.requireKey;
+  }
   $('data-path').textContent = state.dataFile;
   $('service-status').textContent = state.config.configured ? '已配置 · 未验证连接' : '尚未配置';
   $('service-details').textContent = `模型：${state.config.model || '未填写'} · 密钥：${state.config.keyConfigured ? '已填写' : '未填写'}${state.config.issue ? ` · ${state.config.issue}` : ''}`;
@@ -116,6 +122,37 @@ $('translate-form').addEventListener('submit', async event => {
   finally { setBusy(false); }
 });
 $('cancel-button').addEventListener('click', () => api.cancel().catch(error => notice(error.message, true)));
+$('shortcut-form').addEventListener('input', () => { $('shortcut-form').dataset.dirty = 'true'; });
+$('shortcut-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  $('save-shortcut').disabled = true;
+  try {
+    const next = await api.saveShortcut($('shortcut-input').value);
+    delete $('shortcut-form').dataset.dirty;
+    update(next);
+    notice('快捷键已保存到本地并立即生效。');
+  } catch (error) { notice(error.message, true); }
+  finally { $('save-shortcut').disabled = false; }
+});
+$('service-form').addEventListener('input', () => { $('service-form').dataset.dirty = 'true'; });
+$('service-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  $('save-service').disabled = true;
+  try {
+    if ($('service-clear-key').checked && $('service-key').value) throw new Error('请先取消清除密钥，再填写新密钥。');
+    const next = await api.saveConfig({
+      baseUrl: $('service-url').value, model: $('service-model').value,
+      apiKey: $('service-key').value, requireKey: $('service-require-key').checked,
+      clearKey: $('service-clear-key').checked,
+    });
+    $('service-key').value = '';
+    $('service-clear-key').checked = false;
+    delete $('service-form').dataset.dirty;
+    update(next);
+    notice('配置已保存到本地并生效，下次启动自动读取。尚未验证服务连接。');
+  } catch (error) { notice(error.message, true); }
+  finally { $('save-service').disabled = false; }
+});
 $('reload-config').addEventListener('click', async () => {
   try { update(await api.reload()); notice(state.config.issue || '配置已重新加载。'); }
   catch (error) { notice(error.message, true); }

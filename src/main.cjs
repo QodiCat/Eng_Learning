@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { readConfig, publicConfig } = require('./config.cjs');
+const { saveServiceConfig, saveShortcutConfig } = require('./config-save.cjs');
 const { classifyInput } = require('./translation/input.cjs');
 const { translate, DEFAULT_PROMPT } = require('./translation/client.cjs');
 const { LearningStore } = require('./learning/store.cjs');
@@ -61,7 +62,7 @@ function bindShortcut(next) {
   if (!next) throw new Error('TRANSLATE_SHORTCUT 不能为空。');
   let registered = false;
   try { registered = globalShortcut.register(next, onShortcut); } catch { /* Report invalid accelerator below. */ }
-  if (!registered) throw new Error('快捷键无效或已被其他程序占用，请修改 .env 中的 TRANSLATE_SHORTCUT。');
+  if (!registered) throw new Error('快捷键无效或已被其他程序占用，请在翻译设置中修改。');
   if (config?.shortcut && config.shortcut !== next) globalShortcut.unregister(config.shortcut);
 }
 
@@ -75,6 +76,22 @@ function handle(channel, callback) {
 
 function registerHandlers() {
   handle('state', snapshot);
+  handle('shortcut:save', value => {
+    if (activeRequest || captureBusy) throw new Error('请等待当前任务结束再保存快捷键。');
+    const disk = readConfig(root);
+    if (disk.dataDirectory !== config.dataDirectory) throw new Error('修改 DATA_DIRECTORY 后请重新启动应用。');
+    config = saveShortcutConfig(root, value, globalShortcut, onShortcut, config.shortcut);
+    shortcutIssue = '';
+    return snapshot();
+  });
+  handle('config:save', input => {
+    if (activeRequest || captureBusy) throw new Error('请等待当前任务结束再保存配置。');
+    const disk = readConfig(root);
+    if (disk.dataDirectory !== config.dataDirectory) throw new Error('修改 DATA_DIRECTORY 后请重新启动应用。');
+    if (disk.shortcut !== config.shortcut) throw new Error('快捷键配置已在文件中修改，请先重新加载配置。');
+    config = saveServiceConfig(root, input);
+    return snapshot();
+  });
   handle('translate', text => {
     if (captureBusy) throw new Error('正在从其他应用取词，请稍候。');
     return runTranslation(text);

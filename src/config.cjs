@@ -40,15 +40,15 @@ function readConfig(directory, environment = process.env) {
 }
 
 function endpoint(config) {
-  if (!config.baseUrl) throw new Error('请在 .env 中填写 AI_BASE_URL。');
+  if (!config.baseUrl) throw new Error('请在翻译设置中填写服务地址。');
   let url;
   try { url = new URL(config.baseUrl); } catch { throw new Error('AI_BASE_URL 不是有效地址。'); }
   if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.search || url.hash) {
     throw new Error('AI_BASE_URL 必须是无账号、查询参数或片段的 HTTP(S) 地址。');
   }
   if (/\/chat\/completions\/?$/.test(url.pathname)) throw new Error('AI_BASE_URL 只填写 API 前缀，不包含 /chat/completions。');
-  if (!config.model) throw new Error('请在 .env 中填写 AI_MODEL。');
-  if (config.requireKey && !config.apiKey) throw new Error('请在本地 .env 中填写 AI_API_KEY。');
+  if (!config.model) throw new Error('请在翻译设置中填写模型名称。');
+  if (config.requireKey && !config.apiKey) throw new Error('请在翻译设置中填写 API 密钥。');
   url.pathname = `${url.pathname.replace(/\/$/, '')}/chat/completions`;
   return url;
 }
@@ -57,7 +57,7 @@ function publicConfig(config) {
   let issue = '';
   try { endpoint(config); } catch (error) { issue = error.message; }
   return {
-    file: config.file, model: config.model, shortcut: config.shortcut,
+    file: config.file, baseUrl: config.baseUrl, model: config.model, requireKey: config.requireKey, shortcut: config.shortcut,
     configured: !issue, issue, keyConfigured: Boolean(config.apiKey),
     maxInputLength: config.maxInputLength,
   };

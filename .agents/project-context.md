@@ -59,3 +59,13 @@ test/                      核心业务与 HTTP 协议测试
 - 日终自动提醒尚未实现，只能主动打开当天列表，不将原需求标记为已完成。
 - 文档随配置与代码同步更新，产品目标和批准状态仍只在 .product/ 中维护。
 - 参考：[Chat Completions](https://developers.openai.com/api/reference/resources/chat)、[globalShortcut](https://www.electronjs.org/docs/latest/api/global-shortcut/)、[Electron security](https://www.electronjs.org/docs/latest/tutorial/security)。
+
+## 2026-10-28 服务设置更新
+- 翻译设置内可编辑服务地址、模型、密钥和鉴权要求，保存到当前运行目录 .env 并立即应用。
+- config-save.cjs 负责校验与临时文件替换；保留其他 .env 配置值，保存时重写格式与注释。同名进程环境变量覆盖时拒绝保存并提示。
+- 密钥不通过状态 IPC 返回；空白保留、显式清除，.env 明文存储。
+
+## 2026-10-29 快捷键设置更新
+- 翻译设置增加独立快捷键表单与 shortcut:save IPC；无需先配置 AI，保存到 .env 并立即注册。
+- config-save.cjs 复用现有写盘逻辑；先注册新组合，再持久化，成功后释放旧组合；写盘失败释放新组合，保留旧组合。
+- 覆盖空值、无效、占用、环境变量覆盖、写盘失败、重启读取及保留密钥测试；Electron smoke 增加实际快捷键注册与拒绝无效组合检查。

@@ -55,12 +55,23 @@
     <section id="page-settings" class="page" hidden>
       <div class="page-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h1>按你的习惯，解释每个词。</h1><p>连接自己的服务，也可以调整翻译提示词。</p></div></div>
       <section class="card"><div class="card-heading"><h2>OpenAI 兼容服务</h2><span id="service-status" class="pill"></span></div>
-        <p>在下方本地 <code>.env</code> 文件中填写 <code>AI_BASE_URL</code>、<code>AI_MODEL</code>、<code>AI_API_KEY</code>，保存后重新加载。</p>
+        <form id="service-form">
+          <label for="service-url">服务地址（API 前缀，通常以 /v1 结尾）</label><input id="service-url" type="url" required autocomplete="off" placeholder="https://你的服务地址/v1">
+          <label for="service-model">模型名称</label><input id="service-model" required autocomplete="off">
+          <label for="service-key">API 密钥（留空保留已保存的密钥）</label><input id="service-key" type="password" autocomplete="new-password">
+          <label><input id="service-require-key" type="checkbox">服务需要 API 密钥</label>
+          <label><input id="service-clear-key" type="checkbox">清除已保存的密钥</label>
+          <button id="save-service" type="submit" class="primary">保存并应用</button>
+        </form>
         <p id="env-path" class="path"></p><p id="service-details" class="muted"></p>
-        <p class="quiet">地址填 API 前缀，通常以 /v1 结尾，不含 /chat/completions。快捷键在 TRANSLATE_SHORTCUT 中修改。密钥不会显示在界面中。</p>
+        <p class="quiet">配置保存在上方本机 .env 文件中，密钥以明文存储，已保存的密钥不会回显。地址不含 /chat/completions。</p>
         <button id="reload-config" class="secondary">重新加载配置</button>
       </section>
       <section class="card prompt-card"><h2>翻译提示词</h2><form id="prompt-form"><label for="prompt">影响下一次翻译，已有记录保持原译文。</label><textarea id="prompt" rows="6" maxlength="10000" required></textarea><div class="toolbar"><button type="submit" class="primary">保存提示词</button><button id="reset-prompt" type="button" class="secondary">恢复默认</button></div></form></section>
+      <section class="card prompt-card"><h2>取词快捷键</h2>
+        <form id="shortcut-form" class="toolbar"><label for="shortcut-input">快捷键组合</label><input id="shortcut-input" required autocomplete="off" placeholder="例如 Ctrl+Alt+E"><button id="save-shortcut" type="submit" class="primary">保存快捷键</button></form>
+        <p class="quiet">填写组合，例如 Ctrl+Alt+E 或 Ctrl+Shift+F8。保存后立即生效并在重启后保留；被占用或保存失败时保留原快捷键。</p>
+      </section>
       <p class="quiet">学习记录位置：<span id="data-path"></span>。关闭窗口会退出应用并释放快捷键。</p>
     </section>
   </main>
