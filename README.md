@@ -43,6 +43,15 @@ npm.cmd run build
 
 lint 检查 JS 语法和行数；smoke 使用隐藏窗口与隔离数据，输出 `artifacts/desktop-smoke.png`。检查不使用真实 AI 服务。
 
+测试当前模型的真实 API 连接（会发送一次请求，可能消耗服务额度）：
+
+```powershell
+npm.cmd run test:api
+npm.cmd run test:api -- hello
+```
+
+脚本复用项目根目录 `.env` 的服务配置和现有翻译客户端，进程环境变量优先。默认翻译 `apple`，成功显示译文和耗时，失败输出原因并以非零状态退出；不写入学习记录。软件内保存的自定义翻译提示词不用于此连通性测试。打包版配置在 exe 同级，如要测试该配置，需在项目 `.env` 中配置同一服务。
+
 构建产物为 `dist/WordBridge-win32-x64/WordBridge.exe`，需要保留整个目录。包内不含开发机密钥，exe 同级 .env 从空密钥模板生成。当前未签名、无安装器、未发布。
 
 ## 当前限制

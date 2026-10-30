@@ -13,6 +13,7 @@
 | 安装 install | `npm ci` | package-lock.json；postinstall 安装 Electron 运行时 |
 | 开发 dev | `npm run dev` | package.json；首次创建无密钥的 .env |
 | 测试 test | `npm test`；`npm run smoke` | Node 测试；Electron 隐藏窗口冒烟检查 |
+| API 联调 | `npm run test:api` | 读取项目 .env，发送一次真实翻译请求 |
 | 静态检查 lint | `npm run lint` | JS 语法与 500 行限制检查，不含完整风格 lint |
 | 构建 build | `npm run build` | Windows x64 便携应用包，未签名 |
 | 部署 deploy | 无 | 无部署配置或 CI |

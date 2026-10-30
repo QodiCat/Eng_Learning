@@ -9,6 +9,7 @@
     "postinstall": "node node_modules/electron/install.js",
     "dev": "node scripts/launch.cjs",
     "test": "node --test test/*.test.cjs",
+    "test:api": "node scripts/test-api.cjs",
     "lint": "node scripts/check.cjs",
     "build": "node scripts/package.cjs",
     "smoke": "node scripts/launch.cjs --smoke-test",
