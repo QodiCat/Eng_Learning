@@ -21,12 +21,13 @@ function readConfig(directory, environment = process.env) {
     if (!['true', 'false'].includes(values[name])) throw new Error(`${name} 必须是 true 或 false。`);
     return values[name] === 'true';
   };
+  if (!['bearer', 'raw'].includes(values.AI_AUTH_SCHEME)) throw new Error('AI_AUTH_SCHEME 必须是 bearer 或 raw。');
   if (values.DATA_DIRECTORY && !path.isAbsolute(values.DATA_DIRECTORY)) {
     throw new Error('DATA_DIRECTORY 必须为绝对路径。');
   }
   return {
     file, baseUrl: values.AI_BASE_URL.trim(), model: values.AI_MODEL.trim(),
-    apiKey: values.AI_API_KEY.trim(), requireKey: boolean('AI_REQUIRE_KEY'),
+    apiKey: values.AI_API_KEY.trim(), authScheme: values.AI_AUTH_SCHEME, requireKey: boolean('AI_REQUIRE_KEY'),
     timeoutMs: number('AI_TIMEOUT_MS', 100, 300000),
     maxResponseBytes: number('AI_MAX_RESPONSE_BYTES', 1024, 10485760),
     shortcut: values.TRANSLATE_SHORTCUT.trim(),

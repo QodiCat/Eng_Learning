@@ -9,7 +9,7 @@ async function translate(input, prompt, config, { signal, fetchImpl = fetch } = 
   try {
     response = await fetchImpl(url, {
       method: 'POST', redirect: 'error', signal: requestSignal,
-      headers: { 'Content-Type': 'application/json', ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}) },
+      headers: { 'Content-Type': 'application/json', ...(config.apiKey ? { Authorization: config.authScheme === 'raw' ? config.apiKey : `Bearer ${config.apiKey}` } : {}) },
       body: JSON.stringify({ model: config.model, stream: false, messages: [
         { role: 'system', content: prompt },
         { role: 'user', content: input.text },

@@ -92,6 +92,8 @@ test('local config overrides defaults, environment overrides local, secrets are 
   assert.throws(() => endpoint({ ...config, baseUrl: 'https://user:password@provider.example' }));
   assert.throws(() => readConfig(directory, { AI_TIMEOUT_MS: 'garbage' }));
   assert.throws(() => readConfig(directory, { ALLOW_CHINESE_SENTENCES: 'maybe' }));
+  assert.equal(readConfig(directory, { AI_AUTH_SCHEME: 'raw' }).authScheme, 'raw');
+  assert.throws(() => readConfig(directory, { AI_AUTH_SCHEME: 'invalid' }), /AI_AUTH_SCHEME/);
 });
 
 const { saveServiceConfig } = require('../src/config-save.cjs');

@@ -11,7 +11,7 @@ const fs = require('node:fs');
   const directories = await packager({
     dir: path.join(__dirname, '..'), name: 'WordBridge', platform: 'win32', arch: 'x64',
     out: path.join(__dirname, '..', 'dist'), overwrite: true, asar: false,
-    ignore: [/^\/\.(?:git|agents|product)(?:\/|$)/, /^\/\.env(?:\.|$)(?!example$)/, /^\/(?:artifacts|test|dist)(?:\/|$)/, /^\/AGENTS\.md$/],
+    ignore: [/^\/\.(?:git|agents|product)(?:\/|$)/, /^\/\.env(?:\.|$)(?!example$)/, /^\/(?:artifacts|test|dist)(?:\/|$)/, /^\/AGENTS\.md$/, /^\/test\.py$/],
     prune: true,
   });
   for (const directory of directories) {

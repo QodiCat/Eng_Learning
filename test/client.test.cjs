@@ -29,6 +29,18 @@ test('configuration errors prevent sending any request', async () => {
   assert.equal(called, false);
 });
 
+test('raw authorization matches services that require an unprefixed credential', async () => {
+  let authorization;
+  const result = await translate(input, 'prompt', { ...config, authScheme: 'raw' }, {
+    fetchImpl: async (_url, options) => {
+      authorization = options.headers.Authorization;
+      return new Response(JSON.stringify({ choices: [{ message: { content: '苹果' } }] }));
+    },
+  });
+  assert.equal(authorization, config.apiKey);
+  assert.equal(result, '苹果');
+});
+
 test('HTTP errors are explicit without echoing response secrets', async () => {
   await assert.rejects(translate(input, 'prompt', config, { fetchImpl: async () => new Response('test-only-secret', { status: 401 }) }), error => error.message.includes('401') && !error.message.includes('test-only-secret'));
 });

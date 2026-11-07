@@ -78,3 +78,10 @@ test/                      核心业务与 HTTP 协议测试
 - 翻译设置增加独立快捷键表单与 shortcut:save IPC；无需先配置 AI，保存到 .env 并立即注册。
 - config-save.cjs 复用现有写盘逻辑；先注册新组合，再持久化，成功后释放旧组合；写盘失败释放新组合，保留旧组合。
 - 覆盖空值、无效、占用、环境变量覆盖、写盘失败、重启读取及保留密钥测试；Electron smoke 增加实际快捷键注册与拒绝无效组合检查。
+
+## 2026-11-07 翻译请求兼容
+
+- 对照用户提供的 test.py，新增 AI_AUTH_SCHEME=bearer|raw；默认 bearer，raw 原样发送 Authorization。保存服务设置保留此高级配置。
+- 桌面翻译注入 Electron net.fetch，使用 Chromium 网络栈及系统代理支持；Node test:api 仍使用 Node fetch，两者网络路径可能不同。
+- 本机两份 .env 已按参考脚本对齐服务、模型和鉴权；不记录密钥。test.py 排除 Git 和构建复制。
+- 16 项测试、lint、build、打包 smoke 通过；真实 Node 调用超时，Electron 沙箱外实时验证被自动审批拒绝，尚未验证服务恢复。源码与打包版已同步。

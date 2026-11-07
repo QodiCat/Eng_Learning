@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, globalShortcut, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, globalShortcut, dialog, net } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
@@ -29,7 +29,7 @@ async function runTranslation(raw) {
   activeRequest = request;
   send('working', { text: input.text });
   try {
-    const translation = await translate(input, store.data.prompt, config, { signal: request.signal });
+    const translation = await translate(input, store.data.prompt, config, { signal: request.signal, fetchImpl: (url, options) => net.fetch(url.toString(), options) });
     request.signal.throwIfAborted();
     const result = store.record(input, translation);
     send('result', { result });
