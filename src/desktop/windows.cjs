@@ -45,7 +45,10 @@ function createDesktop({ smoke }) {
     window.focus();
   }
   const showMain = () => show(main);
-  const showPopup = () => show(popup);
+  const showPopup = () => {
+    show(popup);
+    popup.webContents.send('app:event', { type: 'focus-query' });
+  };
   app.on('before-quit', () => { quitting = true; });
   app.on('will-quit', () => tray?.destroy());
   // Create a tray before enabling close-to-hide, so background mode is reachable.

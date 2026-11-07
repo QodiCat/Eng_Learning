@@ -34,6 +34,7 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape') api.hidePopup().catch(error => notice(error.message, true));
 });
 api.onEvent(event => {
+  if (event.type === 'focus-query') { $('query').focus(); $('query').select(); }
   if (event.type === 'selection') { $('query').value = event.text; notice(''); }
   if (event.type === 'working') {
     setBusy(true);

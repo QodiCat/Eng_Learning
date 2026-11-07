@@ -24,14 +24,14 @@
     <header class="topbar"><span>个人学习空间</span><span id="today-label"></span></header>
     <div id="notice" role="status" aria-live="polite" hidden></div>
     <section id="page-translate" class="page">
-      <div class="page-heading"><div><p class="eyebrow">DISCOVER A WORD</p><h1>遇见一个词，记住一点新知。</h1><p>选中文字，按下 <kbd id="shortcut">加载中</kbd> 开始翻译。</p></div><span class="chapter">01 / 翻译</span></div>
+      <div class="page-heading"><div><p class="eyebrow">DISCOVER A WORD</p><h1>遇见一个词，记住一点新知。</h1><p>选中中文词语或英文单词，按 <kbd id="shortcut">加载中</kbd> 自动翻译。</p></div><span class="chapter">01 / 翻译</span></div>
       <div id="config-banner" class="banner" hidden><div><strong>先连接你的翻译服务</strong><p id="config-issue"></p></div><button class="secondary" data-open-settings>前往设置 ↗</button></div>
       <div class="translation-grid">
         <section class="card input-card"><div class="card-heading"><h2>查一个词</h2><span class="pill">中 ⇄ EN</span></div>
           <form id="translate-form"><label for="query">也可以在这里输入</label><textarea id="query" rows="4" placeholder="一个新单词，或想表达的中文词语…" required></textarea>
             <div class="input-footer"><span>英文单词 · 中文词语</span><button id="translate-button" type="submit" class="primary">翻译 <span>↗</span></button></div></form>
           <button id="cancel-button" class="secondary" hidden>取消当前翻译</button>
-          <p class="quiet">仅在你主动查询时，将选中文字发送到配置的 AI 服务。</p>
+          <p class="quiet">中文词语译英文，英文单词查中文。仅在你主动查询时发送到配置的 AI 服务。</p>
         </section>
         <section class="card result-card" aria-live="polite"><div class="card-heading"><h2>翻译结果</h2><span id="result-language" class="muted">等待查询</span></div>
           <div id="result-empty" class="empty"><span class="empty-symbol">Aa</span><h3>从一个词开始</h3><p>释义、查询次数和词库来源<br>会一起出现在这里。</p></div>
@@ -68,11 +68,11 @@
         <button id="reload-config" class="secondary">重新加载配置</button>
       </section>
       <section class="card prompt-card"><h2>翻译提示词</h2><form id="prompt-form"><label for="prompt">影响下一次翻译，已有记录保持原译文。</label><textarea id="prompt" rows="6" maxlength="10000" required></textarea><div class="toolbar"><button type="submit" class="primary">保存提示词</button><button id="reset-prompt" type="button" class="secondary">恢复默认</button></div></form></section>
-      <section class="card prompt-card"><h2>取词快捷键</h2>
+      <section class="card prompt-card"><h2>翻译窗口快捷键</h2>
         <form id="shortcut-form" class="toolbar"><label for="shortcut-input">快捷键组合</label><input id="shortcut-input" required autocomplete="off" placeholder="例如 Ctrl+Alt+E"><button id="save-shortcut" type="submit" class="primary">保存快捷键</button></form>
         <p class="quiet">填写组合，例如 Ctrl+Alt+E 或 Ctrl+Shift+F8。保存后立即生效并在重启后保留；被占用或保存失败时保留原快捷键。</p>
       </section>
-      <p class="quiet">学习记录位置：<span id="data-path"></span>。关闭窗口会退出应用并释放快捷键。</p>
+      <p class="quiet">学习记录位置：<span id="data-path"></span>。关闭窗口后继续后台运行，右键托盘图标可退出。</p>
     </section>
   </main>
 </body>

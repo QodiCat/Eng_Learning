@@ -25,14 +25,14 @@ function snapshot() {
   return { ...store.snapshot(), config: publicConfig(config), shortcutIssue, dataFile: store.file, busy: Boolean(activeRequest) || captureBusy };
 }
 
-async function runTranslation(raw) {
+async function runTranslation(raw, fetchImpl = (url, options) => net.fetch(url.toString(), options)) {
   if (activeRequest) throw new Error('已有翻译请求进行中，请等待完成或先取消。');
   const input = classifyInput(raw, config);
   const request = new AbortController();
   activeRequest = request;
   send('working', { text: input.text });
   try {
-    const translation = await translate(input, store.data.prompt, config, { signal: request.signal, fetchImpl: (url, options) => net.fetch(url.toString(), options) });
+    const translation = await translate(input, store.data.prompt, config, { signal: request.signal, fetchImpl });
     request.signal.throwIfAborted();
     const result = store.record(input, translation);
     send('result', { result });
@@ -43,7 +43,11 @@ async function runTranslation(raw) {
   }
 }
 
-async function onShortcut(capture = captureSelection) {
+async function onShortcut(capture = captureSelection, mode = config.shortcutMode, fetchImpl) {
+  if (mode === 'popup') {
+    desktop.showPopup();
+    return;
+  }
   if (captureBusy || activeRequest) {
     if (activeRequest) desktop.showPopup();
     send('notice', { message: '已有取词或翻译任务，请稍候或取消。' });
@@ -55,7 +59,7 @@ async function onShortcut(capture = captureSelection) {
     desktop.showPopup();
     send('selection', { text: selection.text });
     if (selection.warning) send('notice', { message: selection.warning });
-    await runTranslation(selection.text);
+    await runTranslation(selection.text, fetchImpl);
   } catch (error) {
     desktop.showPopup();
     send('error', { message: error.message });

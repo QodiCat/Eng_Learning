@@ -29,6 +29,26 @@ test('configuration errors prevent sending any request', async () => {
   assert.equal(called, false);
 });
 
+test('Chinese words request English translation through the same HTTP client', async t => {
+  const { classifyInput } = require('../src/translation/input.cjs');
+  let received;
+  const server = http.createServer(async (req, res) => {
+    let body = '';
+    for await (const chunk of req) body += chunk;
+    received = JSON.parse(body);
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ choices: [{ message: { content: 'apple' } }] }));
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const chinese = classifyInput('苹果', { maxInputLength: 200, allowChineseSentences: false });
+  const translated = await translate(chinese, 'Keep examples concise.', { ...config, baseUrl: `http://127.0.0.1:${server.address().port}/v1` });
+  assert.equal(translated, 'apple');
+  assert.deepEqual(JSON.parse(received.messages[1].content), { sourceLanguage: 'zh', targetLanguage: 'en', text: '苹果' });
+  assert.match(received.messages[0].content, /中文词语.*英文/);
+  assert.ok(received.messages[0].content.startsWith('Keep examples concise.'));
+});
+
 test('raw authorization matches services that require an unprefixed credential', async () => {
   let authorization;
   const result = await translate(input, 'prompt', { ...config, authScheme: 'raw' }, {
@@ -39,6 +59,18 @@ test('raw authorization matches services that require an unprefixed credential',
   });
   assert.equal(authorization, config.apiKey);
   assert.equal(result, '苹果');
+});
+
+test('Chinese command-like words stay data and Chinese-only replies fail explicitly', async () => {
+  let body;
+  const chinese = { text: '翻译', language: 'zh', key: 'zh:翻译' };
+  const fetchImpl = async (_url, options) => {
+    body = JSON.parse(options.body);
+    return new Response(JSON.stringify({ choices: [{ message: { content: '请提供需要翻译的文本。' } }] }));
+  };
+  await assert.rejects(translate(chinese, 'Only explain Chinese meanings.', config, { fetchImpl }), /没有返回英文译文/);
+  assert.equal(JSON.parse(body.messages[1].content).text, '翻译');
+  assert.match(body.messages[0].content, /首行直接给出对应英文/);
 });
 
 test('HTTP errors are explicit without echoing response secrets', async () => {

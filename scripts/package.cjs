@@ -1,8 +1,12 @@
 const path = require('node:path');
 const fs = require('node:fs');
+const { parseEnv } = require('node:util');
 
 (async () => {
   const { packager } = await import('@electron/packager');
+  const envPath = path.join(__dirname, '..', '.env');
+  const local = fs.existsSync(envPath) ? parseEnv(fs.readFileSync(envPath, 'utf8')) : {};
+  const electronZipDir = process.env.ELECTRON_ZIP_DIRECTORY ?? local.ELECTRON_ZIP_DIRECTORY;
   const target = path.resolve(__dirname, '..', 'dist', 'WordBridge-win32-x64');
   const outputRoot = path.resolve(__dirname, '..', 'dist');
   if (path.dirname(target) !== outputRoot) throw new Error('Invalid build output directory');
@@ -15,6 +19,7 @@ const fs = require('node:fs');
   const directories = await packager({
     dir: path.join(__dirname, '..'), name: 'WordBridge', platform: 'win32', arch: 'x64',
     out: staging, overwrite: true, asar: false,
+    ...(electronZipDir ? { electronZipDir } : {}),
     ignore: [/^\/\.(?:git|agents|product)(?:\/|$)/, /^\/\.env(?:\.|$)(?!example$)/, /^\/(?:artifacts|test|dist)(?:\/|$)/, /^\/AGENTS\.md$/, /^\/test\.py$/],
     prune: true,
   });

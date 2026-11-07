@@ -22,6 +22,7 @@ function readConfig(directory, environment = process.env) {
     return values[name] === 'true';
   };
   if (!['bearer', 'raw'].includes(values.AI_AUTH_SCHEME)) throw new Error('AI_AUTH_SCHEME 必须是 bearer 或 raw。');
+  if (!['popup', 'selection'].includes(values.SHORTCUT_MODE)) throw new Error('SHORTCUT_MODE 必须是 popup 或 selection。');
   if (values.DATA_DIRECTORY && !path.isAbsolute(values.DATA_DIRECTORY)) {
     throw new Error('DATA_DIRECTORY 必须为绝对路径。');
   }
@@ -31,6 +32,7 @@ function readConfig(directory, environment = process.env) {
     timeoutMs: number('AI_TIMEOUT_MS', 100, 300000),
     maxResponseBytes: number('AI_MAX_RESPONSE_BYTES', 1024, 10485760),
     shortcut: values.TRANSLATE_SHORTCUT.trim(),
+    shortcutMode: values.SHORTCUT_MODE,
     captureTimeoutMs: number('CAPTURE_TIMEOUT_MS', 100, 10000),
     captureProcessTimeoutMs: number('CAPTURE_PROCESS_TIMEOUT_MS', 12000, 60000),
     maxInputLength: number('MAX_INPUT_LENGTH', 1, 10000),

@@ -92,6 +92,9 @@ test('local config overrides defaults, environment overrides local, secrets are 
   assert.throws(() => endpoint({ ...config, baseUrl: 'https://user:password@provider.example' }));
   assert.throws(() => readConfig(directory, { AI_TIMEOUT_MS: 'garbage' }));
   assert.throws(() => readConfig(directory, { ALLOW_CHINESE_SENTENCES: 'maybe' }));
+  assert.equal(readConfig(directory, {}).shortcutMode, 'selection');
+  assert.equal(readConfig(directory, { SHORTCUT_MODE: 'selection' }).shortcutMode, 'selection');
+  assert.throws(() => readConfig(directory, { SHORTCUT_MODE: 'invalid' }), /SHORTCUT_MODE/);
   assert.equal(readConfig(directory, { AI_AUTH_SCHEME: 'raw' }).authScheme, 'raw');
   assert.throws(() => readConfig(directory, { AI_AUTH_SCHEME: 'invalid' }), /AI_AUTH_SCHEME/);
 });
