@@ -33,6 +33,17 @@ test('HTTP errors are explicit without echoing response secrets', async () => {
   await assert.rejects(translate(input, 'prompt', config, { fetchImpl: async () => new Response('test-only-secret', { status: 401 }) }), error => error.message.includes('401') && !error.message.includes('test-only-secret'));
 });
 
+test('connection errors show safe causes without exposing raw error details', async () => {
+  for (const code of ['UND_ERR_CONNECT_TIMEOUT', 'ENOTFOUND', 'ECONNREFUSED', 'CERT_HAS_EXPIRED']) {
+    const error = new TypeError('fetch failed', { cause: Object.assign(new Error(config.apiKey), { code }) });
+    await assert.rejects(translate(input, 'prompt', config, { fetchImpl: async () => { throw error; } }),
+      failure => failure.message.includes(code) && !failure.message.includes(config.apiKey));
+  }
+  const programmingError = new TypeError('unexpected implementation error');
+  await assert.rejects(translate(input, 'prompt', config, { fetchImpl: async () => { throw programmingError; } }),
+    error => error === programmingError);
+});
+
 test('invalid, empty, truncated and oversized responses never look successful', async () => {
   for (const body of ['invalid', '{}', '{"choices":[{"message":{"content":""}}]}', JSON.stringify({ choices: [{ message: { content: 'partial' }, finish_reason: 'length' }] }), 'x'.repeat(2048)]) {
     await assert.rejects(translate(input, 'prompt', config, { fetchImpl: async () => new Response(body) }));

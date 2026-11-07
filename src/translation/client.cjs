@@ -37,7 +37,21 @@ async function translate(input, prompt, config, { signal, fetchImpl = fetch } = 
   } catch (error) {
     if (signal?.aborted) throw new Error('翻译已取消，未计入查询次数。');
     if (timeout.aborted) throw new Error('翻译请求超时，请检查服务后重试。');
-    if (error instanceof TypeError) throw new Error('无法连接翻译服务，请检查网络、服务地址及接口兼容性。');
+    if (error instanceof TypeError && error.message === 'fetch failed') {
+      const code = error.cause?.code;
+      const hints = {
+        UND_ERR_CONNECT_TIMEOUT: '建立连接超时，尚未收到 HTTP 响应；请对比其他应用的代理和 DNS 设置',
+        ENOTFOUND: '服务域名解析失败',
+        EAI_AGAIN: '服务域名解析暂时失败',
+        ECONNREFUSED: '服务连接被拒绝',
+        ECONNRESET: '服务连接被重置',
+        CERT_HAS_EXPIRED: '服务 TLS 证书已过期',
+        DEPTH_ZERO_SELF_SIGNED_CERT: '服务 TLS 证书不受信任',
+        UNABLE_TO_VERIFY_LEAF_SIGNATURE: '无法验证服务 TLS 证书链',
+      };
+      const detail = hints[code];
+      throw new Error(detail ? `无法连接翻译服务：${detail}（${code}）。` : '无法连接翻译服务，请检查服务地址、代理和 TLS 配置。');
+    }
     throw error;
   }
 }

@@ -25,3 +25,4 @@ main().catch(error => {
   console.error(`API 测试失败：${error.message}`);
   process.exitCode = 1;
 });
+
