@@ -85,3 +85,12 @@ test/                      核心业务与 HTTP 协议测试
 - 桌面翻译注入 Electron net.fetch，使用 Chromium 网络栈及系统代理支持；Node test:api 仍使用 Node fetch，两者网络路径可能不同。
 - 本机两份 .env 已按参考脚本对齐服务、模型和鉴权；不记录密钥。test.py 排除 Git 和构建复制。
 - 16 项测试、lint、build、打包 smoke 通过；真实 Node 调用超时，Electron 沙箱外实时验证被自动审批拒绝，尚未验证服务恢复。源码与打包版已同步。
+
+## 2026-11-07 后台驻留与快捷翻译窗
+
+- 用户授权：关闭主窗口后持续后台运行，取词快捷键唤起小翻译窗口。需求与交付记录见 .product/phase-1/development-scope.md，未批准 PRD。
+- src/desktop/windows.cjs 管理双窗口、安全来源、托盘和关闭隐藏；主进程在取词后显示小窗，两个窗口共享原翻译服务及学习记录。小窗仅允许 state/translate/cancel/desktop:main/desktop:hide，设置 IPC 仍仅主窗口可调用。
+- 主窗口和小窗关闭均隐藏，Esc 隐藏小窗；托盘双击打开主窗口，菜单可打开主窗口、快捷翻译或明确退出。退出取消请求并释放快捷键；不做开机自启。
+- scripts/smoke-desktop.cjs 检查后台存活、取词先于小窗显示、主窗口保持隐藏、权限、纯文本结果、关闭/重开与托盘入口；smoke 使用独立 userData 避免现有应用单实例锁导致假成功。
+- 打包改为 dist 临时目录生成后更新目标目录内容，保留 .env，避免 Windows 持有目标目录句柄时 rmdir EBUSY。临时和清理路径校验限定在 dist 内。
+- 16 项 Node 测试、lint、build、源码及打包版 smoke 通过（Electron 检查在沙箱外运行）。本机服务配置保留。未做真实 AI 请求、跨应用取词实机验收或开机自启测试；未发布、未记录客户验收通过。

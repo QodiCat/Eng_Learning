@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>拾词 · 快捷翻译</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="popup.js" defer></script>
+</head>
+<body>
+  <header><div><strong>拾词</strong><span>快捷翻译</span></div><button id="open-main" type="button">主窗口 / 设置</button></header>
+  <form id="translate-form">
+    <label for="query">单词或中文词语</label>
+    <div class="input-row"><input id="query" autocomplete="off" placeholder="输入，或在其他应用选词后按快捷键" autofocus><button id="translate-button" type="submit">翻译</button></div>
+    <div class="status-row"><span id="shortcut"></span><button id="cancel-button" type="button" hidden>取消翻译</button></div>
+  </form>
+  <p id="notice" role="status" hidden></p>
+  <section id="result" aria-live="polite">
+    <h1 id="result-word">随手查一个词</h1>
+    <p id="result-meta">选中文字，按取词快捷键即可翻译。</p>
+    <p id="result-sources"></p>
+    <div id="result-text">成功翻译会自动保存到学习记录。</div>
+  </section>
+  <footer>关闭或按 Esc 隐藏 · 退出请右键系统托盘图标</footer>
+</body>
+</html>

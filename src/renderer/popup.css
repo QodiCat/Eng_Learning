@@ -1,0 +1,26 @@
+:root { font: 14px/1.6 "Segoe UI", "Microsoft YaHei", sans-serif; color: #25352d; background: #f5f6f2; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 20px; }
+header, header > div, .input-row, .status-row { display: flex; align-items: center; gap: 10px; }
+header { justify-content: space-between; margin-bottom: 20px; }
+header strong { font-size: 22px; }
+header span, #shortcut, footer, #result-meta { color: #6a756c; font-size: 12px; }
+button, input { font: inherit; border: 1px solid #d5ddd2; border-radius: 8px; padding: 8px 10px; }
+button { cursor: pointer; background: white; color: #35513c; white-space: nowrap; }
+button:disabled { cursor: wait; opacity: .6; }
+button:focus-visible, input:focus { outline: 2px solid #638366; outline-offset: 2px; }
+label { display: block; font-size: 12px; margin-bottom: 6px; }
+input { min-width: 0; flex: 1; width: 100%; background: #fff; }
+#translate-button { background: #345941; color: white; border-color: #345941; }
+.status-row { justify-content: space-between; margin-top: 8px; min-height: 30px; }
+#cancel-button { padding: 2px 8px; font-size: 12px; }
+#notice { background: #e8ede4; border-radius: 8px; padding: 10px; overflow-wrap: anywhere; }
+#notice.error { background: #fae9e4; color: #963e29; }
+#result { margin-top: 12px; background: #fff; border: 1px solid #e0e5da; border-radius: 12px; padding: 18px; }
+h1 { margin: 0; font-size: 23px; overflow-wrap: anywhere; }
+#result-meta { margin: 6px 0; }
+#result-sources { color: #55734b; font-size: 12px; }
+#result-sources:empty { display: none; }
+#result-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+footer { margin-top: 16px; font-size: 11px; }
+[hidden] { display: none !important; }

@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 
-async function runSmoke(window, root) {
+async function runSmoke(window, root, desktop, onShortcut) {
   const errors = [];
   window.webContents.on('console-message', (_event, level, message) => { if (level >= 3) errors.push(message); });
   const state = await window.webContents.executeJavaScript('window.wordbridge.state()');
@@ -50,6 +50,8 @@ async function runSmoke(window, root) {
   fs.mkdirSync(directory, { recursive: true });
   const screenshot = await window.webContents.capturePage(undefined, { stayHidden: true, stayAwake: true });
   fs.writeFileSync(path.join(directory, 'desktop-smoke.png'), screenshot.toPNG());
+  const { runDesktopSmoke } = require('./smoke-desktop.cjs');
+  await runDesktopSmoke(desktop, onShortcut, directory);
   assert.deepEqual(errors, []);
   console.log('Electron smoke passed: IPC, navigation, input rejection, renderer isolation, layout, screenshot.');
 }

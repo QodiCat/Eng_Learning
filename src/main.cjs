@@ -1,7 +1,7 @@
-const { app, BrowserWindow, ipcMain, globalShortcut, dialog, net } = require('electron');
+const { app, ipcMain, globalShortcut, dialog, net } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
-const { pathToFileURL } = require('node:url');
+const { createDesktop } = require('./desktop/windows.cjs');
 const { readConfig, publicConfig } = require('./config.cjs');
 const { saveServiceConfig, saveShortcutConfig } = require('./config-save.cjs');
 const { classifyInput } = require('./translation/input.cjs');
@@ -13,11 +13,14 @@ const { captureSelection } = require('./windows/capture.cjs');
 const smoke = process.argv.includes('--smoke-test');
 if (smoke) app.disableHardwareAcceleration();
 const root = app.isPackaged ? path.dirname(app.getPath('exe')) : path.join(__dirname, '..');
-const html = path.join(__dirname, 'renderer', 'index.html');
-let window, config, store, activeRequest, captureBusy = false, shortcutIssue = '';
-const indexUrl = pathToFileURL(html).href;
+if (smoke) {
+  const profile = path.join(root, 'artifacts', 'smoke-profile');
+  fs.mkdirSync(profile, { recursive: true });
+  app.setPath('userData', profile);
+}
+let window, desktop, config, store, activeRequest, captureBusy = false, shortcutIssue = '';
 
-function send(type, payload) { if (window && !window.isDestroyed()) window.webContents.send('app:event', { type, ...payload }); }
+function send(type, payload) { desktop?.send(type, payload); }
 function snapshot() {
   return { ...store.snapshot(), config: publicConfig(config), shortcutIssue, dataFile: store.file, busy: Boolean(activeRequest) || captureBusy };
 }
@@ -40,18 +43,21 @@ async function runTranslation(raw) {
   }
 }
 
-async function onShortcut() {
-  if (captureBusy || activeRequest) { send('notice', { message: '已有取词或翻译任务，请稍候或取消。' }); return; }
+async function onShortcut(capture = captureSelection) {
+  if (captureBusy || activeRequest) {
+    if (activeRequest) desktop.showPopup();
+    send('notice', { message: '已有取词或翻译任务，请稍候或取消。' });
+    return;
+  }
   captureBusy = true;
   try {
-    const selection = await captureSelection(config);
-    window.show();
-    window.focus();
+    const selection = await capture(config);
+    desktop.showPopup();
     send('selection', { text: selection.text });
     if (selection.warning) send('notice', { message: selection.warning });
     await runTranslation(selection.text);
   } catch (error) {
-    window.show();
+    desktop.showPopup();
     send('error', { message: error.message });
   } finally { captureBusy = false; send('idle', {}); }
 }
@@ -68,7 +74,7 @@ function bindShortcut(next) {
 
 function handle(channel, callback) {
   ipcMain.handle(channel, async (event, ...args) => {
-    if (event.sender !== window.webContents || event.senderFrame?.url !== indexUrl) return { ok: false, error: '不允许的调用来源。' };
+    if (!desktop?.accepts(event, channel)) return { ok: false, error: '不允许的调用来源。' };
     try { return { ok: true, data: await callback(...args) }; }
     catch (error) { return { ok: false, error: error.message }; }
   });
@@ -76,6 +82,8 @@ function handle(channel, callback) {
 
 function registerHandlers() {
   handle('state', snapshot);
+  handle('desktop:main', () => { desktop.showMain(); desktop.popup.hide(); });
+  handle('desktop:hide', () => desktop.popup.hide());
   handle('shortcut:save', value => {
     if (activeRequest || captureBusy) throw new Error('请等待当前任务结束再保存快捷键。');
     const disk = readConfig(root);
@@ -124,32 +132,26 @@ function registerHandlers() {
 async function start() {
   config = readConfig(root);
   store = new LearningStore(smoke ? path.join(root, 'artifacts', 'smoke-data') : config.dataDirectory || app.getPath('userData'));
-  window = new BrowserWindow({
-    title: '拾词 · WordBridge', width: 1120, height: 800, minWidth: 840, minHeight: 620,
-    show: false, backgroundColor: '#f5f6f2', autoHideMenuBar: true,
-    webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: !smoke },
-  });
-  window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
-  window.webContents.on('will-navigate', event => event.preventDefault());
-  window.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
+  desktop = createDesktop({ smoke });
+  window = desktop.main;
   registerHandlers();
   try { bindShortcut(config.shortcut); } catch (error) { shortcutIssue = error.message; }
-  await window.loadFile(html);
+  await desktop.load();
   if (smoke) {
     const { runSmoke } = require('../scripts/smoke.cjs');
-    await runSmoke(window, root);
+    await runSmoke(window, root, desktop, onShortcut);
     app.quit();
-  } else window.show();
+  } else desktop.showMain();
 }
 
 app.setName('WordBridge');
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
-  app.on('second-instance', () => { if (window) { if (window.isMinimized()) window.restore(); window.show(); window.focus(); } });
+  app.on('second-instance', () => desktop?.showMain());
   app.whenReady().then(start).catch(error => {
     if (smoke) { console.error(error.stack); app.exit(1); }
     else { dialog.showErrorBox('拾词启动失败', error.message); app.quit(); }
   });
 }
-app.on('window-all-closed', () => app.quit());
+app.on('window-all-closed', () => { if (smoke) app.quit(); });
 app.on('will-quit', () => { activeRequest?.abort(); globalShortcut.unregisterAll(); });

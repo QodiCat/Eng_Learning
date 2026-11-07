@@ -8,16 +8,31 @@ const fs = require('node:fs');
   if (path.dirname(target) !== outputRoot) throw new Error('Invalid build output directory');
   const configPath = path.join(target, '.env');
   const existingConfig = fs.existsSync(configPath) ? fs.readFileSync(configPath) : null;
+  fs.mkdirSync(outputRoot, { recursive: true });
+  const staging = fs.mkdtempSync(path.join(outputRoot, '.package-'));
+  if (path.dirname(path.resolve(staging)) !== outputRoot) throw new Error('Invalid staging directory');
+  try {
   const directories = await packager({
     dir: path.join(__dirname, '..'), name: 'WordBridge', platform: 'win32', arch: 'x64',
-    out: path.join(__dirname, '..', 'dist'), overwrite: true, asar: false,
+    out: staging, overwrite: true, asar: false,
     ignore: [/^\/\.(?:git|agents|product)(?:\/|$)/, /^\/\.env(?:\.|$)(?!example$)/, /^\/(?:artifacts|test|dist)(?:\/|$)/, /^\/AGENTS\.md$/, /^\/test\.py$/],
     prune: true,
   });
   for (const directory of directories) {
-    fs.copyFileSync(path.join(__dirname, '..', '.env.example'), path.join(directory, '.env.example'));
-    if (existingConfig) fs.writeFileSync(path.join(directory, '.env'), existingConfig);
-    else fs.copyFileSync(path.join(__dirname, '..', '.env.example'), path.join(directory, '.env'));
-    console.log(`Windows portable app: ${directory}`);
+    // Keep the destination directory itself: Windows may hold an Explorer/CWD
+    // handle to it even after the old app exits. Never remove the local config.
+    fs.mkdirSync(target, { recursive: true });
+    for (const name of fs.readdirSync(target)) {
+      if (name === '.env') continue;
+      const entry = path.resolve(target, name);
+      if (path.dirname(entry) !== target) throw new Error('Invalid package entry');
+      fs.rmSync(entry, { recursive: true, force: true });
+    }
+    fs.cpSync(directory, target, { recursive: true });
+    fs.copyFileSync(path.join(__dirname, '..', '.env.example'), path.join(target, '.env.example'));
+    if (existingConfig) fs.writeFileSync(configPath, existingConfig);
+    else fs.copyFileSync(path.join(target, '.env.example'), configPath);
+    console.log(`Windows portable app: ${target}`);
   }
+  } finally { fs.rmSync(staging, { recursive: true, force: true }); }
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

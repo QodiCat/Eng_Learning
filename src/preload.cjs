@@ -8,6 +8,8 @@ contextBridge.exposeInMainWorld('wordbridge', {
   state: () => invoke('state'),
   translate: text => invoke('translate', text),
   cancel: () => invoke('cancel'),
+  openMain: () => invoke('desktop:main'),
+  hidePopup: () => invoke('desktop:hide'),
   savePrompt: text => invoke('prompt:save', text),
   resetPrompt: () => invoke('prompt:reset'),
   review: (key, day, reviewed) => invoke('review', key, day, reviewed),
