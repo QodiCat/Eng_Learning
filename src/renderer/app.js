@@ -15,7 +15,7 @@ function navigate(page) {
     if (button.dataset.page === page) button.setAttribute('aria-current', 'page');
     else button.removeAttribute('aria-current');
   });
-  if (page === 'learning') refresh().catch(error => notice(error.message, true));
+  if (['learning', 'history', 'libraries'].includes(page)) refresh().catch(error => notice(error.message, true));
 }
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -39,7 +39,7 @@ function showResult(result) {
   $('result-content').hidden = false;
   $('result-word').textContent = result.text;
   $('result-language').textContent = result.language === 'en' ? 'EN → 中' : '中 → EN';
-  $('result-meta').textContent = `此前查询 ${result.previousCount} 次 · 含本次共 ${result.count} 次`;
+  $('result-meta').textContent = result.mode === 'translation' ? '已保存到翻译记录，可从记录中选词入库' : `此前查询 ${result.previousCount} 次 · 含本次共 ${result.count} 次`;
   $('result-text').textContent = result.translation;
   $('result-sources').replaceChildren(sourceTags(result.sources));
 }
@@ -75,11 +75,14 @@ function renderLearning() {
 }
 function update(next) {
   state = next;
+  $('mode').value = state.mode;
+  renderHistory(state, api, refresh, notice);
+  $('personal-list').replaceChildren(...state.words.filter(word => state.personalKeys.includes(word.key)).map(word => { const row = element('details'); row.append(element('summary', word.text), element('p', word.translation)); return row; }));
   $('today-label').textContent = state.today.replaceAll('-', ' / ');
   $('shortcut').textContent = state.config.shortcut.replace('CommandOrControl', 'Ctrl').replaceAll('+', ' + ');
   $('config-banner').hidden = state.config.configured;
   $('config-issue').textContent = state.config.issue;
-  $('query').maxLength = state.config.maxInputLength;
+  $('query').maxLength = state.mode === 'translation' ? state.config.maxTranslationInputLength : state.config.maxInputLength;
   $('env-path').textContent = state.config.file;
   if (!$('shortcut-form').dataset.dirty) $('shortcut-input').value = state.config.shortcut.replace('CommandOrControl', 'Ctrl');
   if (!$('service-form').dataset.dirty) {
@@ -121,6 +124,7 @@ $('translate-form').addEventListener('submit', async event => {
   catch (error) { notice(error.message, true); }
   finally { setBusy(false); }
 });
+$('mode').addEventListener('change', async () => { try { update(await api.saveMode($('mode').value)); } catch (error) { $('mode').value = state.mode; notice(error.message, true); } });
 $('cancel-button').addEventListener('click', () => api.cancel().catch(error => notice(error.message, true)));
 $('shortcut-form').addEventListener('input', () => { $('shortcut-form').dataset.dirty = 'true'; });
 $('shortcut-form').addEventListener('submit', async event => {
@@ -181,6 +185,7 @@ $('library-form').addEventListener('submit', async event => {
   finally { button.disabled = false; }
 });
 api.onEvent(event => {
+  if (event.type === 'mode') refresh().catch(error => notice(error.message, true));
   if (event.type === 'selection') { navigate('translate'); $('query').value = event.text; notice(''); }
   if (event.type === 'working') {
     setBusy(true); $('result-content').hidden = true; $('result-empty').hidden = false;

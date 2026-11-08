@@ -1,5 +1,14 @@
 # 当前工程上下文
 
+## 2026-11-08 学习与翻译模式
+
+- 主窗口与快捷弹窗提供 learning / translation 模式，learning.json 持久化并通过 mode:save IPC 同步；任务进行中拒绝切换。旧版数据补充默认学习模式与空翻译记录、个人词库字段，不改已有记录。
+- translation/input.cjs 按模式校验；学习模式沿用原规则，翻译模式保留句子标点与段落，支持中英词组/整句。MAX_TRANSLATION_INPUT_LENGTH 默认 10000，由 .env.example 提供并公开至 renderer；含中文按中译英，否则英译中。
+- 翻译模式使用完整文本翻译提示，原文以 JSON 数据传入，逐次写 translations，不自动计入 words。history.js 展示记录并支持点击英文原文/译文单词；history:add 仅主窗口可用，主进程校验记录与完整单词归属，查词成功后原子写学习记录和 personalKeys，重复加入拒绝。
+- 我的词库显示个人学习词条；小窗 textarea 支持多行，Enter 提交、Shift+Enter 换行。快捷键沿用原有 selection / popup 配置，两种产品模式共享该行为。
+- 验证：22 项 Node 测试、lint、源码 Electron smoke 通过（沙箱 ACL 失败后沙箱外运行；首次截图 UnknownVizError，重跑通过）。新增模式测试覆盖边界、历史隔离、去重、旧数据与双向请求；smoke 覆盖模式同步、选区句子自动翻译、历史展示和点选。
+- 构建未完成：运行中的 dist/WordBridge-win32-x64/WordBridge.exe 占用 d3dcompiler_47.dll，更新目录报 EPERM；沙箱外构建另遇 fetch failed，指定现有版本缓存后仍被 DLL 占用阻止。打包版未更新、未运行新版 packaged smoke。未调用真实 AI，跨应用取词和实际译文待实机验证；PRD 批准状态不变。
+
 ## 2026-10-30 API 测试脚本
 
 - 后续排查：Node 底层为 `UND_ERR_CONNECT_TIMEOUT`，沙箱外复测仍失败；Windows curl 同源连接也超时，不能仅归因于沙箱限制。系统域名查找返回单个 IPv4，hosts 无对应覆盖；尚未确定与其他应用的 DNS/代理路径差异。

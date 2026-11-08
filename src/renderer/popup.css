@@ -24,3 +24,6 @@ h1 { margin: 0; font-size: 23px; overflow-wrap: anywhere; }
 #result-text { white-space: pre-wrap; overflow-wrap: anywhere; }
 footer { margin-top: 16px; font-size: 11px; }
 [hidden] { display: none !important; }
+
+textarea { width: 100%; box-sizing: border-box; resize: vertical; font: inherit; min-height: 70px; }
+select { font: inherit; padding: 6px; margin: 6px 0; }

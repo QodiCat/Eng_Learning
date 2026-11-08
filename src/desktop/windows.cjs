@@ -68,7 +68,7 @@ function createDesktop({ smoke }) {
     accepts(event, channel) {
       for (const [window, url] of urls) {
         if (!window.isDestroyed() && event.sender === window.webContents && event.senderFrame === window.webContents.mainFrame && event.senderFrame.url === url) {
-          return window === main || ['state', 'translate', 'cancel', 'desktop:main', 'desktop:hide'].includes(channel);
+          return window === main || ['state', 'translate', 'cancel', 'mode:save', 'desktop:main', 'desktop:hide'].includes(channel);
         }
       }
       return false;

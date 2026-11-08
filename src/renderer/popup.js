@@ -14,7 +14,8 @@ function setBusy(value) {
 }
 async function refresh() {
   const state = await api.state();
-  $('query').maxLength = state.config.maxInputLength;
+  $('mode').value = state.mode;
+  $('query').maxLength = state.mode === 'translation' ? state.config.maxTranslationInputLength : state.config.maxInputLength;
   $('shortcut').textContent = state.config.shortcut.replace('CommandOrControl', 'Ctrl');
   setBusy(state.busy);
   if (state.shortcutIssue || state.config.issue) notice(state.shortcutIssue || state.config.issue, true);
@@ -28,12 +29,20 @@ $('translate-form').addEventListener('submit', async event => {
   catch (error) { notice(error.message, true); }
   finally { setBusy(false); }
 });
+$('query').addEventListener('keydown', event => {
+  if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+    event.preventDefault();
+    $('translate-form').requestSubmit();
+  }
+});
+$('mode').addEventListener('change', async () => { try { await api.saveMode($('mode').value); await refresh(); } catch (error) { notice(error.message, true); await refresh(); } });
 $('cancel-button').addEventListener('click', () => api.cancel().catch(error => notice(error.message, true)));
 $('open-main').addEventListener('click', () => api.openMain().catch(error => notice(error.message, true)));
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') api.hidePopup().catch(error => notice(error.message, true));
 });
 api.onEvent(event => {
+  if (event.type === 'mode') refresh().catch(error => notice(error.message, true));
   if (event.type === 'focus-query') { $('query').focus(); $('query').select(); }
   if (event.type === 'selection') { $('query').value = event.text; notice(''); }
   if (event.type === 'working') {
@@ -47,7 +56,7 @@ api.onEvent(event => {
   if (event.type === 'result') {
     const result = event.result;
     $('result-word').textContent = result.text;
-    $('result-meta').textContent = `此前查询 ${result.previousCount} 次 · 累计 ${result.count} 次`;
+    $('result-meta').textContent = result.mode === 'translation' ? '已保存到翻译记录，请到主窗口选词入库' : `此前查询 ${result.previousCount} 次 · 累计 ${result.count} 次`;
     $('result-sources').textContent = result.sources.length ? result.sources.join(' · ') : '未匹配词库';
     $('result-text').textContent = result.translation;
   }

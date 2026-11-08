@@ -6,6 +6,8 @@ const invoke = async (channel, ...args) => {
 };
 contextBridge.exposeInMainWorld('wordbridge', {
   state: () => invoke('state'),
+  saveMode: mode => invoke('mode:save', mode),
+  addHistoryWord: (id, text) => invoke('history:add', id, text),
   translate: text => invoke('translate', text),
   cancel: () => invoke('cancel'),
   openMain: () => invoke('desktop:main'),

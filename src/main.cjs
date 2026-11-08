@@ -25,16 +25,16 @@ function snapshot() {
   return { ...store.snapshot(), config: publicConfig(config), shortcutIssue, dataFile: store.file, busy: Boolean(activeRequest) || captureBusy };
 }
 
-async function runTranslation(raw, fetchImpl = (url, options) => net.fetch(url.toString(), options)) {
+async function runTranslation(raw, fetchImpl = (url, options) => net.fetch(url.toString(), options), selected) {
   if (activeRequest) throw new Error('已有翻译请求进行中，请等待完成或先取消。');
-  const input = classifyInput(raw, config);
+  const input = selected ? store.selectedInput(selected.id, raw, config) : classifyInput(raw, config, store.data.mode);
   const request = new AbortController();
   activeRequest = request;
   send('working', { text: input.text });
   try {
     const translation = await translate(input, store.data.prompt, config, { signal: request.signal, fetchImpl });
     request.signal.throwIfAborted();
-    const result = store.record(input, translation);
+    const result = input.mode === 'translation' ? store.recordTranslation(input, translation) : store.record(input, translation, new Date(), Boolean(selected));
     send('result', { result });
     return result;
   } finally {
@@ -86,6 +86,16 @@ function handle(channel, callback) {
 
 function registerHandlers() {
   handle('state', snapshot);
+  handle('mode:save', mode => {
+    if (activeRequest || captureBusy) throw new Error('请等待当前任务结束后切换模式。');
+    store.setMode(mode);
+    send('mode', { mode });
+    return snapshot();
+  });
+  handle('history:add', (id, text) => {
+    if (captureBusy) throw new Error('正在取词，请稍候。');
+    return runTranslation(text, undefined, { id });
+  });
   handle('desktop:main', () => { desktop.showMain(); desktop.popup.hide(); });
   handle('desktop:hide', () => desktop.popup.hide());
   handle('shortcut:save', value => {

@@ -36,6 +36,7 @@ function readConfig(directory, environment = process.env) {
     captureTimeoutMs: number('CAPTURE_TIMEOUT_MS', 100, 10000),
     captureProcessTimeoutMs: number('CAPTURE_PROCESS_TIMEOUT_MS', 12000, 60000),
     maxInputLength: number('MAX_INPUT_LENGTH', 1, 10000),
+    maxTranslationInputLength: number('MAX_TRANSLATION_INPUT_LENGTH', 1, 1000000),
     maxImportBytes: number('MAX_IMPORT_BYTES', 1, 52428800),
     allowChineseSentences: boolean('ALLOW_CHINESE_SENTENCES'),
     dataDirectory: values.DATA_DIRECTORY,
@@ -62,7 +63,7 @@ function publicConfig(config) {
   return {
     file: config.file, baseUrl: config.baseUrl, model: config.model, requireKey: config.requireKey, shortcut: config.shortcut,
     configured: !issue, issue, keyConfigured: Boolean(config.apiKey),
-    maxInputLength: config.maxInputLength,
+    maxInputLength: config.maxInputLength, maxTranslationInputLength: config.maxTranslationInputLength,
   };
 }
 

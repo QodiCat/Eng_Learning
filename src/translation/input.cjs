@@ -1,7 +1,13 @@
-function classifyInput(raw, config) {
+function classifyInput(raw, config, mode = 'learning') {
+  if (!['learning', 'translation'].includes(mode)) throw new Error('无效模式。');
   if (typeof raw !== 'string') throw new Error('请输入文字。');
-  const text = raw.normalize('NFKC').trim();
+  const text = mode === 'translation' ? raw.trim() : raw.normalize('NFKC').trim();
   if (!text) throw new Error('未获取到选中文字，请先选中文字再按快捷键。');
+  if (mode === 'translation') {
+    if (text.length > config.maxTranslationInputLength) throw new Error('文本超过 MAX_TRANSLATION_INPUT_LENGTH 字符上限。');
+    if (!/[A-Za-z\p{Script=Han}]/u.test(text)) throw new Error('请输入中文或英文文本。');
+    return { text, language: /\p{Script=Han}/u.test(text) ? 'zh' : 'en', mode };
+  }
   if (text.length > config.maxInputLength) throw new Error(`文字不能超过 ${config.maxInputLength} 个字符。`);
   const english = text.replace(/^["'“”‘’(\[]+|["'“”‘’)\],.!?;:]+$/g, '');
   if (/^[A-Za-z]+(?:[-'’][A-Za-z]+)*$/.test(english)) {

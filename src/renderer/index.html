@@ -6,6 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>拾词 · WordBridge</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="history.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -13,7 +14,8 @@
     <div class="brand"><span class="brand-mark">拾</span><div><strong>拾词</strong><small>WORDBRIDGE</small></div></div>
     <p class="nav-label">你的单词空间</p>
     <nav aria-label="主导航">
-      <button class="nav-item active" data-page="translate" aria-current="page"><span>⌕</span>划词翻译</button>
+      <button class="nav-item active" data-page="translate" aria-current="page"><span>⌕</span>学习 / 翻译</button>
+      <button class="nav-item" data-page="history"><span>↔</span>翻译记录</button>
       <button class="nav-item" data-page="learning"><span>▤</span>学习记录</button>
       <button class="nav-item" data-page="libraries"><span>▥</span>我的词库</button>
       <button class="nav-item" data-page="settings"><span>⚙</span>翻译设置</button>
@@ -24,12 +26,12 @@
     <header class="topbar"><span>个人学习空间</span><span id="today-label"></span></header>
     <div id="notice" role="status" aria-live="polite" hidden></div>
     <section id="page-translate" class="page">
-      <div class="page-heading"><div><p class="eyebrow">DISCOVER A WORD</p><h1>遇见一个词，记住一点新知。</h1><p>选中中文词语或英文单词，按 <kbd id="shortcut">加载中</kbd> 自动翻译。</p></div><span class="chapter">01 / 翻译</span></div>
+      <div class="page-heading"><div><p class="eyebrow">DISCOVER A WORD</p><h1>遇见一个词，记住一点新知。</h1><p>选中文字，按 <kbd id="shortcut">加载中</kbd> 自动翻译。</p></div><span class="chapter">01 / 翻译</span></div>
       <div id="config-banner" class="banner" hidden><div><strong>先连接你的翻译服务</strong><p id="config-issue"></p></div><button class="secondary" data-open-settings>前往设置 ↗</button></div>
       <div class="translation-grid">
         <section class="card input-card"><div class="card-heading"><h2>查一个词</h2><span class="pill">中 ⇄ EN</span></div>
-          <form id="translate-form"><label for="query">也可以在这里输入</label><textarea id="query" rows="4" placeholder="一个新单词，或想表达的中文词语…" required></textarea>
-            <div class="input-footer"><span>英文单词 · 中文词语</span><button id="translate-button" type="submit" class="primary">翻译 <span>↗</span></button></div></form>
+          <form id="translate-form"><label for="mode">当前模式</label><select id="mode"><option value="learning">学习模式</option><option value="translation">翻译模式</option></select><label for="query">也可以在这里输入</label><textarea id="query" rows="4" placeholder="学习模式查词；翻译模式支持词组、长句和段落…" required></textarea>
+            <div class="input-footer"><span>学习模式查词 · 翻译模式查句</span><button id="translate-button" type="submit" class="primary">翻译 <span>↗</span></button></div></form>
           <button id="cancel-button" class="secondary" hidden>取消当前翻译</button>
           <p class="quiet">中文词语译英文，英文单词查中文。仅在你主动查询时发送到配置的 AI 服务。</p>
         </section>
@@ -40,6 +42,7 @@
       </div>
       <section class="daily-strip"><div><p class="eyebrow">SMALL STEPS, EVERY DAY</p><h2>今天的积累</h2><p>每一次成功查词，都会留下学习记录。</p></div><div class="stat"><strong id="today-count">0</strong><span>今日单词</span></div><div class="stat"><strong id="review-count">0</strong><span>已复习</span></div><button id="open-learning" class="text-button">去复习 →</button></section>
     </section>
+    <section id="page-history" class="page" hidden><div class="page-heading"><div><h1>翻译记录</h1><p>点击英文原文或译文中的单词，再加入我的学习词库。</p></div></div><div id="history-list" class="word-list"></div></section>
     <section id="page-learning" class="page" hidden>
       <div class="page-heading"><div><p class="eyebrow">YOUR WORD JOURNEY</p><h1>让查过的词，成为会用的词。</h1><p>按天回顾查询记录，复习后标记；可以随时撤销。</p></div></div>
       <div class="toolbar"><label for="learning-day">学习日期</label><input type="date" id="learning-day"><button id="refresh-learning" class="secondary">刷新</button><span id="learning-summary" class="muted"></span></div>
@@ -50,7 +53,7 @@
       <section class="card"><h2>导入英文词库</h2><p class="muted">支持 UTF-8 TXT（每行一个英文单词）或 JSON 字符串数组。无需重复收录同一个词。</p>
         <form id="library-form" class="toolbar"><label for="library-name">词库名称</label><input id="library-name" placeholder="例如：我的四级词库" maxlength="100" required><button type="submit" class="primary">选择文件并导入</button></form>
         <p class="quiet">同名词库会提示冲突；文件有无效项时整份不导入。应用不内置考试词库。</p>
-      </section><div id="library-list" class="library-list"></div>
+      </section><section class="card"><h2>我的学习词库</h2><div id="personal-list"></div></section><div id="library-list" class="library-list"></div>
     </section>
     <section id="page-settings" class="page" hidden>
       <div class="page-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h1>按你的习惯，解释每个词。</h1><p>连接自己的服务，也可以调整翻译提示词。</p></div></div>

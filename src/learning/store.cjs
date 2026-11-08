@@ -20,9 +20,21 @@ class LearningStore {
         throw new Error(`学习数据无法读取或格式不兼容；原文件未覆盖：${this.file}`);
       }
     }
+    this.data.mode ??= 'learning';
+    this.data.translations ??= [];
+    this.data.personalKeys ??= [];
   }
 
   validate(data) {
+    if (data.mode !== undefined && !['learning', 'translation'].includes(data.mode)) throw new Error('Invalid mode');
+    if (data.personalKeys !== undefined && (!Array.isArray(data.personalKeys) || !data.personalKeys.every(key => data.words?.some(word => word.key === key)))) throw new Error('Invalid personal words');
+    if (data.translations !== undefined) {
+      if (!Array.isArray(data.translations)) throw new Error('Invalid history');
+      for (const item of data.translations) {
+        if (typeof item.id !== 'string' || typeof item.text !== 'string' || typeof item.translation !== 'string' || !['en', 'zh'].includes(item.language) || !Number.isFinite(Date.parse(item.lastAt))) throw new Error('Invalid history entry');
+      }
+      if (new Set(data.translations.map(item => item.id)).size !== data.translations.length) throw new Error('Duplicate history');
+    }
     if (data.version !== 1 || typeof data.prompt !== 'string' || !Array.isArray(data.words) || !Array.isArray(data.libraries)) throw new Error('Invalid data');
     for (const word of data.words) {
       if (typeof word.key !== 'string' || typeof word.text !== 'string' || typeof word.translation !== 'string' ||
@@ -52,13 +64,38 @@ class LearningStore {
     return result;
   }
 
-  record(input, translation, now = new Date()) {
+  setMode(mode) {
+    if (!['learning', 'translation'].includes(mode)) throw new Error('无效模式。');
+    this.commit(data => { data.mode = mode; });
+  }
+  recordTranslation(input, translation, now = new Date()) {
+    return this.commit(data => {
+      const item = { id: randomUUID(), text: input.text, language: input.language, translation, lastAt: now.toISOString(), mode: 'translation', sources: [] };
+      data.translations.push(item);
+      return structuredClone(item);
+    });
+  }
+  selectedInput(id, text, config) {
+    const item = this.data.translations.find(entry => entry.id === id);
+    if (!item || typeof text !== 'string') throw new Error('翻译记录不存在。');
+    const { classifyInput } = require('../translation/input.cjs');
+    const input = classifyInput(text, config);
+    const tokens = (item.text + '\n' + item.translation).match(/[A-Za-z]+(?:[-'’][A-Za-z]+)*/g) || [];
+    if (input.language !== 'en' || !tokens.some(token => token.toLowerCase().replaceAll('’', "'") === input.text.toLowerCase().replaceAll('’', "'"))) throw new Error('请选择这条翻译记录中的英文单词。');
+    if (this.data.personalKeys.includes(input.key)) throw new Error('该单词已在我的学习词库中。');
+    return input;
+  }
+  record(input, translation, now = new Date(), personal = false) {
     return this.commit(data => {
       let word = data.words.find(item => item.key === input.key);
       const previousCount = word?.count || 0;
       if (!word) {
         word = { key: input.key, text: input.text, language: input.language, count: 0, days: [], reviewedDays: [] };
         data.words.push(word);
+      }
+      if (personal) {
+        if (data.personalKeys.includes(input.key)) throw new Error('该单词已在我的学习词库中。');
+        data.personalKeys.push(input.key);
       }
       word.count += 1;
       word.translation = translation;
@@ -71,7 +108,8 @@ class LearningStore {
   sources(key) { return this.data.libraries.filter(library => library.keys.includes(key)).map(library => library.name); }
   snapshot() {
     return {
-      today: dayKey(), prompt: this.data.prompt,
+      today: dayKey(), prompt: this.data.prompt, mode: this.data.mode,
+      translations: structuredClone(this.data.translations).reverse(), personalKeys: [...this.data.personalKeys],
       words: this.data.words.map(word => ({ ...structuredClone(word), sources: this.sources(word.key) })).sort((a, b) => b.lastAt.localeCompare(a.lastAt)),
       libraries: this.data.libraries.map(library => ({ name: library.name, count: library.keys.length })),
     };

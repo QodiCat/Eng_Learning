@@ -52,6 +52,7 @@ async function runSmoke(window, root, desktop, onShortcut) {
   fs.writeFileSync(path.join(directory, 'desktop-smoke.png'), screenshot.toPNG());
   const { runDesktopSmoke } = require('./smoke-desktop.cjs');
   await runDesktopSmoke(desktop, onShortcut, directory);
+  await require('./smoke-modes.cjs').runModesSmoke(desktop, onShortcut);
   assert.deepEqual(errors, []);
   console.log('Electron smoke passed: IPC, navigation, input rejection, renderer isolation, layout, screenshot.');
 }
