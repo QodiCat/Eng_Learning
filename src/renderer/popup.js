@@ -14,7 +14,6 @@ function setBusy(value) {
 }
 async function refresh() {
   const state = await api.state();
-  $('mode').value = state.mode;
   $('query').maxLength = state.mode === 'translation' ? state.config.maxTranslationInputLength : state.config.maxInputLength;
   $('shortcut').textContent = state.config.shortcut.replace('CommandOrControl', 'Ctrl');
   setBusy(state.busy);
@@ -35,7 +34,6 @@ $('query').addEventListener('keydown', event => {
     $('translate-form').requestSubmit();
   }
 });
-$('mode').addEventListener('change', async () => { try { await api.saveMode($('mode').value); await refresh(); } catch (error) { notice(error.message, true); await refresh(); } });
 $('cancel-button').addEventListener('click', () => api.cancel().catch(error => notice(error.message, true)));
 $('open-main').addEventListener('click', () => api.openMain().catch(error => notice(error.message, true)));
 document.addEventListener('keydown', event => {
@@ -48,21 +46,22 @@ api.onEvent(event => {
   if (event.type === 'working') {
     setBusy(true);
     notice('');
-    $('result-word').textContent = event.text;
-    $('result-meta').textContent = '正在等待翻译结果…';
+    $('result-meta').textContent = '';
+    $('result-meta').hidden = true;
     $('result-sources').textContent = '';
-    $('result-text').textContent = '';
+    $('result-text').textContent = '正在等待翻译结果…';
   }
   if (event.type === 'result') {
     const result = event.result;
-    $('result-word').textContent = result.text;
-    $('result-meta').textContent = result.mode === 'translation' ? '已保存到翻译记录，请到主窗口选词入库' : `此前查询 ${result.previousCount} 次 · 累计 ${result.count} 次`;
-    $('result-sources').textContent = result.sources.length ? result.sources.join(' · ') : '未匹配词库';
+    const translationMode = result.mode === 'translation';
+    $('result-meta').hidden = translationMode;
+    $('result-meta').textContent = translationMode ? '' : `此前查询 ${result.previousCount} 次 · 累计 ${result.count} 次`;
+    $('result-sources').textContent = translationMode ? '' : (result.sources.length ? result.sources.join(' · ') : '未匹配词库');
     $('result-text').textContent = result.translation;
   }
   if (event.type === 'idle') {
     setBusy(false);
-    if ($('result-meta').textContent === '正在等待翻译结果…') $('result-meta').textContent = '未完成翻译，请查看提示后重试。';
+    if ($('result-text').textContent === '正在等待翻译结果…') $('result-text').textContent = '未完成翻译，请查看提示后重试。';
   }
   if (event.type === 'error' || event.type === 'notice') notice(event.message, event.type === 'error');
 });

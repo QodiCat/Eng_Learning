@@ -9,5 +9,5 @@ main{margin-left:206px;width:calc(100% - 206px);padding:0 38px 35px}.topbar{heig
 
 select { font: inherit; padding: 8px; margin: 8px; }
 .history-text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 2; }
-.history-token { font: inherit; padding: 0 2px; background: transparent; color: inherit; border: 0; border-bottom: 1px dotted currentColor; cursor: pointer; }
+.history-token { font: inherit; padding: 0 2px; background: transparent; color: inherit; border: 0; border-bottom: 1px dotted currentColor; cursor: pointer; user-select: text; }
 .history-token[aria-pressed="true"] { background: #dce8b6; }

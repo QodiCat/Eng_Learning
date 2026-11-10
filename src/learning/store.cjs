@@ -78,10 +78,8 @@ class LearningStore {
   selectedInput(id, text, config) {
     const item = this.data.translations.find(entry => entry.id === id);
     if (!item || typeof text !== 'string') throw new Error('翻译记录不存在。');
-    const { classifyInput } = require('../translation/input.cjs');
-    const input = classifyInput(text, config);
-    const tokens = (item.text + '\n' + item.translation).match(/[A-Za-z]+(?:[-'’][A-Za-z]+)*/g) || [];
-    if (input.language !== 'en' || !tokens.some(token => token.toLowerCase().replaceAll('’', "'") === input.text.toLowerCase().replaceAll('’', "'"))) throw new Error('请选择这条翻译记录中的英文单词。');
+    const { selectedEnglish } = require('../translation/input.cjs');
+    const input = selectedEnglish(text, [item.text, item.translation], config);
     if (this.data.personalKeys.includes(input.key)) throw new Error('该单词已在我的学习词库中。');
     return input;
   }

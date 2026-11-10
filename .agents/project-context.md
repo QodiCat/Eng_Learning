@@ -1,6 +1,20 @@
 # 当前工程上下文
 
+## 2026-11-08 翻译记录词组入库
+
+- history.js 支持同一原文或译文段落内拖选英文词组，保留单击选词；拖选后 click 不再覆盖为单词。非法字符或跨原译文选择不可提交。history-token 显式允许文本选择。
+- translation/input.cjs 新增 selectedEnglish，供 LearningStore.selectedInput 调用，校验同一来源内连续完整的英文词组；归一大小写、空白与弯撇号，沿用 MAX_INPUT_LENGTH。词组整体调用已有释义流程并存为一个 en: 条目；不放宽学习模式手动输入规则。
+- 23 项 Node 测试、lint、源码和打包版 smoke、构建通过；新增词组归属、部分单词/不连续词拒绝、去重与持久化测试，smoke 覆盖 Range 选择多个词及 click 不覆盖。Windows 便携包已更新，保留现有 .env；未调用真实 AI。
+
+## 2026-11-08 弹窗简化反馈
+
+- 按用户截图移除 popup.html 中模式选择和结果重复原文；popup.js 清理对应监听与赋值，翻译模式不再显示保存提示及词库来源，学习模式保留次数与来源。主窗口负责切换模式，弹窗接收 mode 事件刷新字符上限；移除弹窗对 mode:save 的 IPC 权限。
+- 22 项 Node 测试、lint、源码 Electron smoke 通过；更新 smoke 断言验证精简元素、译文与历史保存，并检查 popup-translation-smoke.png 截图。使用隔离数据，未调用真实 AI。
+- 应用退出后已成功重新构建便携包并保留 .env，打包版 smoke 通过。新增截图首次在打包版使用了错误的资源相对目录，已改用 smoke 的实际 artifacts 目录；修复后遇到一次截图 UnknownVizError，重试通过。
+
 ## 2026-11-08 学习与翻译模式
+
+- 后续重新打包：用户退出旧应用后，使用匹配版本 Electron 缓存执行 build 成功，Windows x64 便携包已更新，原有 .env 保留。打包版 smoke 沙箱内受 ACL 限制，沙箱外首次截图 UnknownVizError，重试通过；验证包含两种模式同步、句子翻译记录及点选单词。未发送真实 AI 请求。
 
 - 主窗口与快捷弹窗提供 learning / translation 模式，learning.json 持久化并通过 mode:save IPC 同步；任务进行中拒绝切换。旧版数据补充默认学习模式与空翻译记录、个人词库字段，不改已有记录。
 - translation/input.cjs 按模式校验；学习模式沿用原规则，翻译模式保留句子标点与段落，支持中英词组/整句。MAX_TRANSLATION_INPUT_LENGTH 默认 10000，由 .env.example 提供并公开至 renderer；含中文按中译英，否则英译中。

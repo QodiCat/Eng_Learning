@@ -9,17 +9,38 @@ function renderHistory(state, api, refresh, notice) {
     const time = document.createElement('p');
     time.textContent = new Date(record.lastAt).toLocaleString();
     const selected = document.createElement('p');
-    selected.textContent = '点击句子中的英文单词';
+    selected.textContent = '点击英文单词，或拖选连续的英文词组';
     const add = document.createElement('button');
     add.className = 'primary';
     add.textContent = '加入我的学习词库';
     add.disabled = true;
     let word = '';
     const buttons = [];
+    function choose(text) {
+      word = text.replaceAll('’', "'").replace(/\s+/g, ' ').trim();
+      const valid = /^[A-Za-z]+(?:[-'][A-Za-z]+)*(?: [A-Za-z]+(?:[-'][A-Za-z]+)*)*$/.test(word);
+      const exists = state.personalKeys.includes(`en:${word.toLowerCase()}`);
+      selected.textContent = valid ? `已选择：${word}${exists ? ' · 已在词库中' : ''}` : '请选择连续完整的英文单词或词组，不包含标点';
+      add.disabled = !valid || exists;
+    }
     card.append(time);
     for (const text of [record.text, record.translation]) {
       const paragraph = document.createElement('div');
       paragraph.className = 'history-text';
+      const selectPhrase = () => {
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed) return;
+        for (const item of buttons) item.setAttribute('aria-pressed', 'false');
+        if (!paragraph.contains(selection.anchorNode) || !paragraph.contains(selection.focusNode)) {
+          word = '';
+          add.disabled = true;
+          selected.textContent = '请在同一段原文或译文中选择词组';
+          return;
+        }
+        choose(selection.toString());
+      };
+      paragraph.addEventListener('mouseup', selectPhrase);
+      paragraph.addEventListener('keyup', selectPhrase);
       for (const part of text.split(/([A-Za-z]+(?:[-'’][A-Za-z]+)*)/g)) {
         if (!/^[A-Za-z]+(?:[-'’][A-Za-z]+)*$/.test(part)) { paragraph.append(document.createTextNode(part)); continue; }
         const button = document.createElement('button');
@@ -27,11 +48,9 @@ function renderHistory(state, api, refresh, notice) {
         button.textContent = part;
         button.setAttribute('aria-pressed', 'false');
         button.addEventListener('click', () => {
-          word = part;
+          if (!window.getSelection().isCollapsed) return;
           for (const item of buttons) item.setAttribute('aria-pressed', String(item === button));
-          const exists = state.personalKeys.includes(`en:${part.toLowerCase().replaceAll('’', "'")}`);
-          selected.textContent = `已选择：${part}${exists ? ' · 已在词库中' : ''}`;
-          add.disabled = exists;
+          choose(part);
         });
         buttons.push(button);
         paragraph.append(button);

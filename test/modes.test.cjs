@@ -8,6 +8,29 @@ const { classifyInput } = require('../src/translation/input.cjs');
 const { translate } = require('../src/translation/client.cjs');
 const config = { maxInputLength: 200, maxTranslationInputLength: 10000, allowChineseSentences: false };
 
+test('selected phrases belong to a single source, normalize whitespace, and persist as one learning item', t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'wordbridge-phrases-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const store = new LearningStore(directory);
+  const record = store.recordTranslation({ text: 'Take  care\nof yourself. Don’t give up, keep going.', language: 'en' }, '照顾好自己。不要放弃，继续前进。');
+  const input = store.selectedInput(record.id, 'TAKE \n care', config);
+  assert.equal(input.key, 'en:take care');
+  assert.equal(input.text, 'TAKE care');
+  assert.equal(store.selectedInput(record.id, "don't give up", config).key, "en:don't give up");
+  for (const invalid of ['care yourself', 'ake care', 'take car', 'up keep', 'give up, keep', '照顾', 'care '.repeat(100)]) {
+    assert.throws(() => store.selectedInput(record.id, invalid, config), invalid);
+  }
+  store.record(input, '照顾；保重', new Date(), true);
+  assert.throws(() => store.selectedInput(record.id, 'take care', config));
+  const restored = new LearningStore(directory).snapshot();
+  assert.equal(restored.words[0].text, 'TAKE care');
+  assert.equal(restored.words[0].translation, '照顾；保重');
+  assert.equal(restored.words[0].count, 1);
+  assert.deepEqual(restored.personalKeys, ['en:take care']);
+  const split = store.recordTranslation({ text: 'hello', language: 'en' }, 'world');
+  assert.throws(() => store.selectedInput(split.id, 'hello world', config));
+});
+
 test('translation accepts phrases and bilingual paragraphs while learning keeps its word boundary', () => {
   for (const text of ['a long sentence.\nA second paragraph.', '今天学习英语。\n明天继续！', 'hello 世界']) {
     assert.equal(classifyInput(text, config, 'translation').text, text);

@@ -10,17 +10,16 @@
 </head>
 <body>
   <header><div><strong>拾词</strong><span>快捷翻译</span></div><button id="open-main" type="button">主窗口 / 设置</button></header>
-  <form id="translate-form"><label for="mode">当前模式</label><select id="mode"><option value="learning">学习模式</option><option value="translation">翻译模式</option></select>
+  <form id="translate-form">
     <label for="query">待翻译文本</label>
     <div class="input-row"><textarea id="query" rows="3" placeholder="输入单词、词组或句子" autofocus></textarea><button id="translate-button" type="submit">翻译</button></div>
     <div class="status-row"><span id="shortcut"></span><button id="cancel-button" type="button" hidden>取消翻译</button></div>
   </form>
   <p id="notice" role="status" hidden></p>
   <section id="result" aria-live="polite">
-    <h1 id="result-word">随手查一个词</h1>
-    <p id="result-meta">选中中文或英文，按快捷键自动翻译。</p>
+    <p id="result-meta" hidden></p>
     <p id="result-sources"></p>
-    <div id="result-text">学习模式保存查词；翻译模式保存翻译记录。</div>
+    <div id="result-text">选中文字，按快捷键翻译。</div>
   </section>
   <footer>关闭或按 Esc 隐藏 · 退出请右键系统托盘图标</footer>
 </body>

@@ -17,7 +17,6 @@ input { min-width: 0; flex: 1; width: 100%; background: #fff; }
 #notice { background: #e8ede4; border-radius: 8px; padding: 10px; overflow-wrap: anywhere; }
 #notice.error { background: #fae9e4; color: #963e29; }
 #result { margin-top: 12px; background: #fff; border: 1px solid #e0e5da; border-radius: 12px; padding: 18px; }
-h1 { margin: 0; font-size: 23px; overflow-wrap: anywhere; }
 #result-meta { margin: 6px 0; }
 #result-sources { color: #55734b; font-size: 12px; }
 #result-sources:empty { display: none; }
@@ -26,4 +25,3 @@ footer { margin-top: 16px; font-size: 11px; }
 [hidden] { display: none !important; }
 
 textarea { width: 100%; box-sizing: border-box; resize: vertical; font: inherit; min-height: 70px; }
-select { font: inherit; padding: 6px; margin: 6px 0; }
