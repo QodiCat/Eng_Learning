@@ -12,7 +12,7 @@ function renderHistory(state, api, refresh, notice) {
     selected.textContent = '点击英文单词，或拖选连续的英文词组';
     const add = document.createElement('button');
     add.className = 'primary';
-    add.textContent = '加入我的学习词库';
+    add.textContent = '加入学习词库';
     add.disabled = true;
     let word = '';
     const buttons = [];
@@ -63,7 +63,7 @@ function renderHistory(state, api, refresh, notice) {
       try {
         await api.addHistoryWord(record.id, chosen);
         await refresh();
-        notice(`已将 ${chosen} 加入我的学习词库和学习记录。`);
+        notice(`已将 ${chosen} 加入学习词库。`);
       } catch (error) { notice(error.message, true); add.disabled = false; }
     });
     card.append(selected, add);

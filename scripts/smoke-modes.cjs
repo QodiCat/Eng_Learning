@@ -47,6 +47,27 @@ async function runModesSmoke(desktop, onShortcut, directory) {
     return { selected: singleSelected, phrase, enabled: !card.querySelector('.primary').disabled, visible: !document.getElementById('page-history').hidden };
   })()`);
   assert.deepEqual(ui, { selected: 'true', phrase: '已选择：sentence with apples', enabled: true, visible: true });
+  const libraries = await main.webContents.executeJavaScript(`(async () => {
+    document.querySelector('[data-page="learning"]').click();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const state = await window.wordbridge.state();
+    const count = document.querySelectorAll('#word-list .word-row').length;
+    const date = document.getElementById('learning-day');
+    const defaultAll = date.value === '';
+    date.value = '1900-01-01';
+    date.dispatchEvent(new Event('change'));
+    const filteredEmpty = document.querySelectorAll('#word-list .word-row').length === 0;
+    document.getElementById('all-learning').click();
+    const restored = document.querySelectorAll('#word-list .word-row').length === state.words.length;
+    document.querySelector('[data-page="libraries"]').click();
+    return {
+      learningName: document.querySelector('[data-page="learning"]').textContent.includes('学习词库'),
+      officialName: document.querySelector('[data-page="libraries"]').textContent.includes('官方词库'),
+      defaultAll, allCount: count === state.words.length, filteredEmpty, restored,
+      noPersonalList: document.getElementById('personal-list') === null,
+    };
+  })()`);
+  assert.deepEqual(libraries, { learningName: true, officialName: true, defaultAll: true, allCount: true, filteredEmpty: true, restored: true, noPersonalList: true });
   await main.webContents.executeJavaScript("window.wordbridge.saveMode('learning')");
   popup.close();
   console.log('Modes smoke passed: shared mode, sentence shortcut, separate history, selectable words.');

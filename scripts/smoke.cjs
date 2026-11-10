@@ -41,6 +41,7 @@ async function runSmoke(window, root, desktop, onShortcut) {
     catch { invalidConfigRejected = true; }
     if (!invalidConfigRejected) throw new Error('无效服务配置必须拒绝');
     document.querySelector('[data-page="translate"]').click();
+    await window.wordbridge.saveMode('learning');
     let rejected = false;
     try { await window.wordbridge.translate('two words'); } catch { rejected = true; }
     return { settingsVisible, rejected, nodeExposed: typeof require !== 'undefined', overflow: document.documentElement.scrollWidth > innerWidth };

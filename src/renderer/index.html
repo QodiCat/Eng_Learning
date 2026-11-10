@@ -16,8 +16,8 @@
     <nav aria-label="主导航">
       <button class="nav-item active" data-page="translate" aria-current="page"><span>⌕</span>学习 / 翻译</button>
       <button class="nav-item" data-page="history"><span>↔</span>翻译记录</button>
-      <button class="nav-item" data-page="learning"><span>▤</span>学习记录</button>
-      <button class="nav-item" data-page="libraries"><span>▥</span>我的词库</button>
+      <button class="nav-item" data-page="learning"><span>▤</span>学习词库</button>
+      <button class="nav-item" data-page="libraries"><span>▥</span>官方词库</button>
       <button class="nav-item" data-page="settings"><span>⚙</span>翻译设置</button>
     </nav>
     <div class="sidebar-bottom"><span class="local-dot"></span>关闭窗口后继续后台运行<p>右键系统托盘图标可退出拾词。</p></div>
@@ -42,18 +42,18 @@
       </div>
       <section class="daily-strip"><div><p class="eyebrow">SMALL STEPS, EVERY DAY</p><h2>今天的积累</h2><p>每一次成功查词，都会留下学习记录。</p></div><div class="stat"><strong id="today-count">0</strong><span>今日单词</span></div><div class="stat"><strong id="review-count">0</strong><span>已复习</span></div><button id="open-learning" class="text-button">去复习 →</button></section>
     </section>
-    <section id="page-history" class="page" hidden><div class="page-heading"><div><h1>翻译记录</h1><p>点击英文单词，或拖选连续的英文词组，再加入我的学习词库。</p></div></div><div id="history-list" class="word-list"></div></section>
+    <section id="page-history" class="page" hidden><div class="page-heading"><div><h1>翻译记录</h1><p>点击英文单词，或拖选连续的英文词组，再加入学习词库。</p></div></div><div id="history-list" class="word-list"></div></section>
     <section id="page-learning" class="page" hidden>
-      <div class="page-heading"><div><p class="eyebrow">YOUR WORD JOURNEY</p><h1>让查过的词，成为会用的词。</h1><p>按天回顾查询记录，复习后标记；可以随时撤销。</p></div></div>
-      <div class="toolbar"><label for="learning-day">学习日期</label><input type="date" id="learning-day"><button id="refresh-learning" class="secondary">刷新</button><span id="learning-summary" class="muted"></span></div>
+      <div class="page-heading"><div><p class="eyebrow">YOUR WORD JOURNEY</p><h1>学习词库</h1><p>汇集学习模式查过的词和翻译记录中选词入库的单词、词组。可按日期筛选复习；全部视图按每个词最近的学习日期标记。</p></div></div>
+      <div class="toolbar"><label for="learning-day">学习日期</label><input type="date" id="learning-day"><button id="all-learning" class="secondary">全部词条</button><button id="refresh-learning" class="secondary">刷新</button><span id="learning-summary" class="muted"></span></div>
       <div id="word-list" class="word-list"></div>
     </section>
     <section id="page-libraries" class="page" hidden>
-      <div class="page-heading"><div><p class="eyebrow">BUILD YOUR COLLECTION</p><h1>每个词，都有来处。</h1><p>导入你自己的词库，查词时显示所有匹配的来源。</p></div></div>
-      <section class="card"><h2>导入英文词库</h2><p class="muted">支持 UTF-8 TXT（每行一个英文单词）或 JSON 字符串数组。无需重复收录同一个词。</p>
-        <form id="library-form" class="toolbar"><label for="library-name">词库名称</label><input id="library-name" placeholder="例如：我的四级词库" maxlength="100" required><button type="submit" class="primary">选择文件并导入</button></form>
+      <div class="page-heading"><div><p class="eyebrow">BUILD YOUR COLLECTION</p><h1>官方词库</h1><p>导入四级、六级、雅思、托福等外部词表，查词时显示所有匹配的来源。</p></div></div>
+      <section class="card"><h2>导入官方词库</h2><p class="muted">支持 UTF-8 TXT（每行一个英文单词）或 JSON 字符串数组。无需重复收录同一个词。</p>
+        <form id="library-form" class="toolbar"><label for="library-name">词库名称</label><input id="library-name" placeholder="例如：四级词库" maxlength="100" required><button type="submit" class="primary">选择文件并导入</button></form>
         <p class="quiet">同名词库会提示冲突；文件有无效项时整份不导入。应用不内置考试词库。</p>
-      </section><section class="card"><h2>我的学习词库</h2><div id="personal-list"></div></section><div id="library-list" class="library-list"></div>
+      </section><div id="library-list" class="library-list"></div>
     </section>
     <section id="page-settings" class="page" hidden>
       <div class="page-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h1>按你的习惯，解释每个词。</h1><p>连接自己的服务，也可以调整翻译提示词。</p></div></div>

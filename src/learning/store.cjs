@@ -80,7 +80,7 @@ class LearningStore {
     if (!item || typeof text !== 'string') throw new Error('翻译记录不存在。');
     const { selectedEnglish } = require('../translation/input.cjs');
     const input = selectedEnglish(text, [item.text, item.translation], config);
-    if (this.data.personalKeys.includes(input.key)) throw new Error('该单词已在我的学习词库中。');
+    if (this.data.personalKeys.includes(input.key)) throw new Error('该单词已在学习词库中。');
     return input;
   }
   record(input, translation, now = new Date(), personal = false) {
@@ -92,7 +92,7 @@ class LearningStore {
         data.words.push(word);
       }
       if (personal) {
-        if (data.personalKeys.includes(input.key)) throw new Error('该单词已在我的学习词库中。');
+        if (data.personalKeys.includes(input.key)) throw new Error('该单词已在学习词库中。');
         data.personalKeys.push(input.key);
       }
       word.count += 1;

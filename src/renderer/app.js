@@ -45,13 +45,14 @@ function showResult(result) {
 }
 function renderLearning() {
   if (!state) return;
-  const day = $('learning-day').value || state.today;
-  const words = state.words.filter(word => word.days.includes(day));
-  $('learning-summary').textContent = `${words.length} 个词 · ${words.filter(word => word.reviewedDays.includes(day)).length} 个已复习`;
+  const selectedDay = $('learning-day').value;
+  const words = state.words.filter(word => !selectedDay || word.days.includes(selectedDay));
+  const reviewDay = word => selectedDay || word.days.at(-1);
+  $('learning-summary').textContent = `${words.length} 个词 · ${words.filter(word => word.reviewedDays.includes(reviewDay(word))).length} 个已复习`;
   $('word-list').replaceChildren();
   if (!words.length) {
     const empty = element('div', undefined, 'card empty');
-    empty.append(element('h3', '这一天还没有学习记录'), element('p', '成功翻译的词会自动出现在这里。'));
+    empty.append(element('h3', selectedDay ? '这一天还没有学习词条' : '学习词库还是空的'), element('p', '学习模式查词或从翻译记录选词入库，成功后会出现在这里。'));
     $('word-list').append(empty);
   }
   for (const word of words) {
@@ -59,6 +60,7 @@ function renderLearning() {
     const header = element('header');
     const title = element('div');
     title.append(element('h2', word.text), element('span', `累计查询 ${word.count} 次`, 'muted'));
+    const day = reviewDay(word);
     const reviewed = word.reviewedDays.includes(day);
     const button = element('button', reviewed ? '已复习 ✓ · 撤销' : '标记已复习', reviewed ? 'secondary' : 'primary');
     button.addEventListener('click', async () => {
@@ -77,7 +79,6 @@ function update(next) {
   state = next;
   $('mode').value = state.mode;
   renderHistory(state, api, refresh, notice);
-  $('personal-list').replaceChildren(...state.words.filter(word => state.personalKeys.includes(word.key)).map(word => { const row = element('details'); row.append(element('summary', word.text), element('p', word.translation)); return row; }));
   $('today-label').textContent = state.today.replaceAll('-', ' / ');
   $('shortcut').textContent = state.config.shortcut.replace('CommandOrControl', 'Ctrl').replaceAll('+', ' + ');
   $('config-banner').hidden = state.config.configured;
@@ -94,7 +95,6 @@ function update(next) {
   $('service-status').textContent = state.config.configured ? '已配置 · 未验证连接' : '尚未配置';
   $('service-details').textContent = `模型：${state.config.model || '未填写'} · 密钥：${state.config.keyConfigured ? '已填写' : '未填写'}${state.config.issue ? ` · ${state.config.issue}` : ''}`;
   if (!$('prompt').dataset.dirty) $('prompt').value = state.prompt;
-  if (!$('learning-day').value) $('learning-day').value = state.today;
   const today = state.words.filter(word => word.days.includes(state.today));
   $('today-count').textContent = today.length;
   $('review-count').textContent = today.filter(word => word.reviewedDays.includes(state.today)).length;
@@ -114,6 +114,7 @@ document.querySelectorAll('[data-page]').forEach(button => button.addEventListen
 document.querySelectorAll('[data-open-settings]').forEach(button => button.addEventListener('click', () => navigate('settings')));
 $('open-learning').addEventListener('click', () => navigate('learning'));
 $('learning-day').addEventListener('change', renderLearning);
+$('all-learning').addEventListener('click', () => { $('learning-day').value = ''; renderLearning(); });
 $('refresh-learning').addEventListener('click', () => refresh().catch(error => notice(error.message, true)));
 $('translate-form').addEventListener('submit', async event => {
   event.preventDefault();
