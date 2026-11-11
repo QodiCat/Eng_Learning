@@ -122,6 +122,7 @@ function registerHandlers() {
   handle('prompt:save', prompt => { store.savePrompt(prompt); return snapshot(); });
   handle('prompt:reset', () => { store.savePrompt(DEFAULT_PROMPT); return snapshot(); });
   handle('review', (key, day, reviewed) => { store.review(key, day, reviewed); return snapshot(); });
+  handle('study', (key, id) => { store.study(key, id); return snapshot(); });
   handle('config:reload', () => {
     if (activeRequest || captureBusy) throw new Error('请等待当前任务结束再重新加载配置。');
     const next = readConfig(root);

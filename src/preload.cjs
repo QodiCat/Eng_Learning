@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld('wordbridge', {
   savePrompt: text => invoke('prompt:save', text),
   resetPrompt: () => invoke('prompt:reset'),
   review: (key, day, reviewed) => invoke('review', key, day, reviewed),
+  study: (key, id) => invoke('study', key, id),
   reload: () => invoke('config:reload'),
   saveConfig: input => invoke('config:save', input),
   saveShortcut: value => invoke('shortcut:save', value),

@@ -45,8 +45,13 @@ function showResult(result) {
 }
 function renderLearning() {
   if (!state) return;
+  const learned = state.words.filter(word => word.studyCount > 0).length;
+  $('learning-total').textContent = state.words.length;
+  $('learning-learned').textContent = learned;
+  $('learning-pending').textContent = state.words.length - learned;
   const selectedDay = $('learning-day').value;
   const words = state.words.filter(word => !selectedDay || word.days.includes(selectedDay));
+  $('start-study').disabled = !words.length;
   const reviewDay = word => selectedDay || word.days.at(-1);
   $('learning-summary').textContent = `${words.length} 个词 · ${words.filter(word => word.reviewedDays.includes(reviewDay(word))).length} 个已复习`;
   $('word-list').replaceChildren();
@@ -59,7 +64,7 @@ function renderLearning() {
     const row = element('article', undefined, 'card word-row');
     const header = element('header');
     const title = element('div');
-    title.append(element('h2', word.text), element('span', `累计查询 ${word.count} 次`, 'muted'));
+    title.append(element('h2', word.text), element('span', `累计查询 ${word.count} 次 · 已学习 ${word.studyCount} 次`, 'muted'));
     const day = reviewDay(word);
     const reviewed = word.reviewedDays.includes(day);
     const button = element('button', reviewed ? '已复习 ✓ · 撤销' : '标记已复习', reviewed ? 'secondary' : 'primary');

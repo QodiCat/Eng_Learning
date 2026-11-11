@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="styles.css">
   <script src="history.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="study.js" defer></script>
 </head>
 <body>
   <aside class="sidebar">
@@ -46,7 +47,22 @@
     <section id="page-learning" class="page" hidden>
       <div class="page-heading"><div><p class="eyebrow">YOUR WORD JOURNEY</p><h1>学习词库</h1><p>汇集学习模式查过的词和翻译记录中选词入库的单词、词组。可按日期筛选复习；全部视图按每个词最近的学习日期标记。</p></div></div>
       <div class="toolbar"><label for="learning-day">学习日期</label><input type="date" id="learning-day"><button id="all-learning" class="secondary">全部词条</button><button id="refresh-learning" class="secondary">刷新</button><span id="learning-summary" class="muted"></span></div>
+      <section class="daily-strip" aria-label="学习词库统计" aria-live="polite">
+        <div><h2>学习进度</h2><p>统计全部词条，完成至少一次卡片学习即为已学习；词组按一个词条计。</p></div>
+        <div class="stat"><strong id="learning-total">0</strong><span>总词数</span></div>
+        <div class="stat"><strong id="learning-learned">0</strong><span>已学习</span></div>
+        <div class="stat"><strong id="learning-pending">0</strong><span>待学习</span></div>
+      </section>
+      <button id="start-study" class="primary" disabled>开始学习</button>
       <div id="word-list" class="word-list"></div>
+      <dialog id="study-dialog" aria-labelledby="study-word">
+        <p id="study-progress" class="muted" aria-live="polite"></p>
+        <h2 id="study-word"></h2><p id="study-count" class="muted"></p>
+        <button id="study-reveal" class="secondary">查看释义</button>
+        <div id="study-meaning" class="translation-text" hidden></div>
+        <div class="toolbar"><button id="study-next" class="primary" disabled>下一词</button><button id="study-exit" class="secondary">结束学习</button></div>
+        <p id="study-error" role="alert"></p>
+      </dialog>
     </section>
     <section id="page-libraries" class="page" hidden>
       <div class="page-heading"><div><p class="eyebrow">BUILD YOUR COLLECTION</p><h1>官方词库</h1><p>导入四级、六级、雅思、托福等外部词表，查词时显示所有匹配的来源。</p></div></div>

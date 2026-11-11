@@ -37,6 +37,8 @@ class LearningStore {
     }
     if (data.version !== 1 || typeof data.prompt !== 'string' || !Array.isArray(data.words) || !Array.isArray(data.libraries)) throw new Error('Invalid data');
     for (const word of data.words) {
+      if (word.studyCount !== undefined && (!Number.isSafeInteger(word.studyCount) || word.studyCount < 0)) throw new Error('Invalid study count');
+      if (word.lastStudyId !== undefined && typeof word.lastStudyId !== 'string') throw new Error('Invalid study identifier');
       if (typeof word.key !== 'string' || typeof word.text !== 'string' || typeof word.translation !== 'string' ||
           !Number.isSafeInteger(word.count) || word.count < 1 || !Array.isArray(word.days) ||
           !word.days.every(day => /^\d{4}-\d{2}-\d{2}$/.test(day)) || !Array.isArray(word.reviewedDays) ||
@@ -104,11 +106,21 @@ class LearningStore {
   }
 
   sources(key) { return this.data.libraries.filter(library => library.keys.includes(key)).map(library => library.name); }
+  study(key, id) {
+    if (typeof id !== 'string' || !/^[0-9a-f-]{36}$/i.test(id)) throw new Error('学习提交标识无效。');
+    this.commit(data => {
+      const word = data.words.find(item => item.key === key);
+      if (!word) throw new Error('学习词条不存在。');
+      if (word.lastStudyId === id) return;
+      word.studyCount = (word.studyCount ?? 0) + 1;
+      word.lastStudyId = id;
+    });
+  }
   snapshot() {
     return {
       today: dayKey(), prompt: this.data.prompt, mode: this.data.mode,
       translations: structuredClone(this.data.translations).reverse(), personalKeys: [...this.data.personalKeys],
-      words: this.data.words.map(word => ({ ...structuredClone(word), sources: this.sources(word.key) })).sort((a, b) => b.lastAt.localeCompare(a.lastAt)),
+      words: this.data.words.map(word => ({ ...structuredClone(word), studyCount: word.studyCount ?? 0, sources: this.sources(word.key) })).sort((a, b) => b.lastAt.localeCompare(a.lastAt)),
       libraries: this.data.libraries.map(library => ({ name: library.name, count: library.keys.length })),
     };
   }

@@ -11,3 +11,4 @@ select { font: inherit; padding: 8px; margin: 8px; }
 .history-text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 2; }
 .history-token { font: inherit; padding: 0 2px; background: transparent; color: inherit; border: 0; border-bottom: 1px dotted currentColor; cursor: pointer; user-select: text; }
 .history-token[aria-pressed="true"] { background: #dce8b6; }
+#start-study{margin:20px 0}#study-dialog{width:min(600px,90vw);max-height:85vh;overflow:auto;border:1px solid var(--line);border-radius:18px;padding:32px;color:inherit;background:#fff}#study-dialog::backdrop{background:#25342e66}#study-word{font-size:32px;overflow-wrap:anywhere;margin:28px 0}#study-error{color:#9c4d41;font-size:13px}
