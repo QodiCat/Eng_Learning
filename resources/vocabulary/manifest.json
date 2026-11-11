@@ -1,0 +1,328 @@
+{
+  "commit": "d92011be195cb9aa535e119302a909f2a6b38ab3",
+  "lists": [
+    {
+      "category": "CET4",
+      "sourceEntries": 4471,
+      "imported": 4406,
+      "duplicates": 0,
+      "rejected": [
+        {
+          "word": "according as",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "according to",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "account for",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "allow for",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "appeal to",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "apply for",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "as follows",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "at one time",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "at present",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "belong to",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "build up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "call for",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "call off",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "check in",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "cheer up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "come to",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "consist of",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "drive up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "fear for",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "fill in",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "fill up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "fix up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "from now on",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "get out of",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "get over",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "give away",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "give in",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "hand out",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "hear from",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "in accordance with",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "in addition to",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "in order to",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "in so far as",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "in the future",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "jet lag",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "let down",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "look after",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "make sure",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "mix up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "pass through",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "pay attention to",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "pay back",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "per cent",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "put up with",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "roll out",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "rub down",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "rub off",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "rub out",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "run off",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "run out",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "run through",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "sell off",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "send off",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "send up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "set aside",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "set down",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "set up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "shake up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "shoot out",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "shoot up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "sit up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "stand for",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "take away",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "take charge",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "touch up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        }
+      ],
+      "sha256": "a28952f3fef6dfbe9e02c2cb647cc054222005fb8cb5ba16d08d98b258e0c5b5"
+    },
+    {
+      "category": "CET6",
+      "sourceEntries": 2083,
+      "imported": 2077,
+      "duplicates": 0,
+      "rejected": [
+        {
+          "word": "account for",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "around the clock",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "fix up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "set aside",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "sit in",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        },
+        {
+          "word": "touch up",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        }
+      ],
+      "sha256": "f548f701a27b2edf05c6f6d49150cd9c0e78cb7c3bfc67a26fa29e6572c683aa"
+    },
+    {
+      "category": "IELTS",
+      "sourceEntries": 4512,
+      "imported": 4511,
+      "duplicates": 0,
+      "rejected": [
+        {
+          "word": "vice versa",
+          "reason": "词库第 1 项不是有效英文单词；本次未导入任何内容。"
+        }
+      ],
+      "sha256": "8ba7e0f0936699567e7213e427c14f404e477b0b2765db399d2db76c63cc3952"
+    },
+    {
+      "category": "TOEFL",
+      "sourceEntries": 3461,
+      "imported": 3461,
+      "duplicates": 0,
+      "rejected": [],
+      "sha256": "32cf01ef363b5aa090f3e5021727efcd2890e918358d1d4f285e97afa7e2e320"
+    }
+  ]
+}

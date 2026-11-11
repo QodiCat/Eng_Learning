@@ -60,6 +60,13 @@
         <h2 id="study-word"></h2><p id="study-count" class="muted"></p>
         <button id="study-reveal" class="secondary">查看释义</button>
         <div id="study-meaning" class="translation-text" hidden></div>
+        <section id="study-memory" hidden>
+          <h3>助记</h3><p class="muted">联想 · 词根词缀 · 谐音 · 场景例句 · 回忆自测</p>
+          <button id="study-mnemonic" class="secondary">生成助记</button>
+          <button id="study-mnemonic-cancel" class="secondary" hidden>取消生成</button>
+          <p class="quiet">点击后通过已配置的 AI 服务生成并保存。谐音仅辅助记忆，请以标准发音为准。</p>
+          <div id="study-mnemonic-text" class="translation-text" aria-live="polite" hidden></div>
+        </section>
         <div class="toolbar"><button id="study-next" class="primary" disabled>下一词</button><button id="study-exit" class="secondary">结束学习</button></div>
         <p id="study-error" role="alert"></p>
       </dialog>

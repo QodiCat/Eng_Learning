@@ -81,6 +81,7 @@ async function runModesSmoke(desktop, onShortcut, directory) {
     const unchanged = (await window.wordbridge.state()).words[0].studyCount === before.words[0].studyCount;
     document.getElementById('start-study').click();
     document.getElementById('study-reveal').click();
+    if (document.getElementById('study-memory').hidden || document.getElementById('study-mnemonic').disabled) throw new Error('Mnemonic entry missing');
     document.getElementById('study-next').click();
     for (let i = 0; i < 100 && document.getElementById('study-exit').disabled; i++) await new Promise(resolve => setTimeout(resolve, 20));
     const after = await window.wordbridge.state();

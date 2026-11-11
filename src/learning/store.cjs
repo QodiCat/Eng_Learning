@@ -37,6 +37,7 @@ class LearningStore {
     }
     if (data.version !== 1 || typeof data.prompt !== 'string' || !Array.isArray(data.words) || !Array.isArray(data.libraries)) throw new Error('Invalid data');
     for (const word of data.words) {
+      if (word.mnemonic !== undefined && (typeof word.mnemonic !== 'string' || !word.mnemonic.trim())) throw new Error('Invalid mnemonic');
       if (word.studyCount !== undefined && (!Number.isSafeInteger(word.studyCount) || word.studyCount < 0)) throw new Error('Invalid study count');
       if (word.lastStudyId !== undefined && typeof word.lastStudyId !== 'string') throw new Error('Invalid study identifier');
       if (typeof word.key !== 'string' || typeof word.text !== 'string' || typeof word.translation !== 'string' ||
@@ -114,6 +115,14 @@ class LearningStore {
       if (word.lastStudyId === id) return;
       word.studyCount = (word.studyCount ?? 0) + 1;
       word.lastStudyId = id;
+    });
+  }
+  saveMnemonic(key, content) {
+    if (typeof content !== 'string' || !content.trim()) throw new Error('助记内容为空，未保存。');
+    this.commit(data => {
+      const word = data.words.find(item => item.key === key);
+      if (!word) throw new Error('学习词条不存在。');
+      word.mnemonic = content.trim();
     });
   }
   snapshot() {

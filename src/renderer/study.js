@@ -1,5 +1,6 @@
 let studySession;
 let studySaving = false;
+let mnemonicSaving = false;
 
 function showStudyCard() {
   const word = studySession.words[studySession.index];
@@ -8,6 +9,11 @@ function showStudyCard() {
   $('study-count').textContent = `已学习 ${word.studyCount} 次`;
   $('study-meaning').textContent = word.translation;
   $('study-meaning').hidden = true;
+  $('study-memory').hidden = true;
+  const saved = state.words.find(item => item.key === word.key)?.mnemonic;
+  $('study-mnemonic-text').textContent = saved || '';
+  $('study-mnemonic-text').hidden = !saved;
+  $('study-mnemonic').textContent = saved ? '重新生成助记' : '生成助记';
   $('study-reveal').hidden = false;
   $('study-next').disabled = true;
   $('study-next').textContent = studySession.index === studySession.words.length - 1 ? '完成' : '下一词';
@@ -26,12 +32,13 @@ $('start-study').addEventListener('click', () => {
 });
 $('study-reveal').addEventListener('click', () => {
   $('study-meaning').hidden = false;
+  $('study-memory').hidden = false;
   $('study-reveal').hidden = true;
   $('study-next').disabled = false;
   $('study-next').focus();
 });
 $('study-next').addEventListener('click', async () => {
-  if (studySaving || !studySession || $('study-meaning').hidden) return;
+  if (studySaving || mnemonicSaving || !studySession || $('study-meaning').hidden) return;
   studySaving = true;
   $('study-next').disabled = true;
   $('study-exit').disabled = true;
@@ -52,5 +59,29 @@ $('study-next').addEventListener('click', async () => {
   }
 });
 $('study-exit').addEventListener('click', () => $('study-dialog').close());
-$('study-dialog').addEventListener('cancel', event => { if (studySaving) event.preventDefault(); });
+$('study-dialog').addEventListener('cancel', event => { if (studySaving || mnemonicSaving) event.preventDefault(); });
 $('study-dialog').addEventListener('close', () => { studySession = null; });
+
+$('study-mnemonic').addEventListener('click', async () => {
+  if (!studySession || mnemonicSaving || studySaving) return;
+  mnemonicSaving = true;
+  for (const id of ['study-next', 'study-exit', 'study-mnemonic']) $(id).disabled = true;
+  $('study-mnemonic').textContent = '正在生成…';
+  $('study-mnemonic-cancel').hidden = false;
+  $('study-error').textContent = '';
+  try {
+    const key = studySession.words[studySession.index].key;
+    const next = await api.mnemonic(key);
+    update(next);
+    const word = next.words.find(item => item.key === key);
+    $('study-mnemonic-text').textContent = word.mnemonic;
+    $('study-mnemonic-text').hidden = false;
+  } catch (error) { $('study-error').textContent = error.message; }
+  finally {
+    mnemonicSaving = false;
+    for (const id of ['study-next', 'study-exit', 'study-mnemonic']) $(id).disabled = false;
+    $('study-mnemonic-cancel').hidden = true;
+    $('study-mnemonic').textContent = $('study-mnemonic-text').textContent ? '重新生成助记' : '生成助记';
+  }
+});
+$('study-mnemonic-cancel').addEventListener('click', () => api.cancel().catch(error => { $('study-error').textContent = error.message; }));

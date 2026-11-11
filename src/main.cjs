@@ -8,6 +8,7 @@ const { classifyInput } = require('./translation/input.cjs');
 const { translate, DEFAULT_PROMPT } = require('./translation/client.cjs');
 const { LearningStore } = require('./learning/store.cjs');
 const { parseLibrary } = require('./learning/import.cjs');
+const { generateMnemonic } = require('./learning/mnemonic.cjs');
 const { captureSelection } = require('./windows/capture.cjs');
 
 const smoke = process.argv.includes('--smoke-test');
@@ -123,6 +124,19 @@ function registerHandlers() {
   handle('prompt:reset', () => { store.savePrompt(DEFAULT_PROMPT); return snapshot(); });
   handle('review', (key, day, reviewed) => { store.review(key, day, reviewed); return snapshot(); });
   handle('study', (key, id) => { store.study(key, id); return snapshot(); });
+  handle('study:mnemonic', async key => {
+    if (activeRequest || captureBusy) throw new Error('已有请求进行中，请稍后再生成助记。');
+    const word = store.snapshot().words.find(item => item.key === key);
+    if (!word) throw new Error('学习词条不存在。');
+    const request = new AbortController();
+    activeRequest = request;
+    try {
+      const content = await generateMnemonic(word, config, { signal: request.signal, fetchImpl: (url, options) => net.fetch(url.toString(), options) });
+      request.signal.throwIfAborted();
+      store.saveMnemonic(key, content);
+      return snapshot();
+    } finally { if (activeRequest === request) activeRequest = null; }
+  });
   handle('config:reload', () => {
     if (activeRequest || captureBusy) throw new Error('请等待当前任务结束再重新加载配置。');
     const next = readConfig(root);
